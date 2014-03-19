@@ -11,7 +11,7 @@ A provisioner that copies all your personal config files over to the VM automati
 
 You can configure the host and guest home directories and override or add to the list of config files to be copied. Any relative paths provided will be relative to the home directories, while absolute paths will be preserved.
 
-Really, this can be used to copy any files/directories from the host to the guest, not just "config files". Wildcard operators are not currently supported.
+Really, this can be used to copy any files/directories from the host to the guest, not just "config files". Wildcard operators are not currently supported, but directories will be copied recursively.
 
 The default list of config files includes `~/.vimrc`, `~/.viminfo`, `~/.gitconfig` and `~/.ssh/known_hosts`
 
