@@ -5,17 +5,17 @@ Vagrant plugin for Forth Rail environments. Provides automatic config management
 
 ## Usage
 
-### `:dotfiles` provisioner
+### Squatter
 
-Copies all your personal config files over to the VM automatically to make it feel more like home.
+A provisioner that copies all your personal config files over to the VM automatically to make it feel more like home.
 
-You can configure the host and guest home directories and override or add to the list of config files to be copied. Any relative paths provided will be relative to the home directories, while absolute paths will be preserved. *Files do not have to be "dotfiles" (do not have to begin with a `.`).* 
+You can configure the host and guest home directories and override or add to the list of config files to be copied. Any relative paths provided will be relative to the home directories, while absolute paths will be preserved.
 
 Really, this can be used to copy any files/directories from the host to the guest, not just "config files". Wildcard operators are not currently supported.
 
 The default list of config files includes `~/.vimrc`, `~/.viminfo`, `~/.gitconfig` and `~/.ssh/known_hosts`
 
-See the example block passed to `config.vm.provision :dotfiles` in this project's `Vagrantfile` for example configuration options.
+See the example block passed to `config.vm.provision :squat` in this project's `Vagrantfile` for usage and configuration options.
 
 ## Development
 

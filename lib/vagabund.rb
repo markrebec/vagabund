@@ -2,14 +2,14 @@ module Vagabund
   class Plugin < Vagrant.plugin(2)
     name "Vagabund"
 
-    config :dotfiles, :provisioner do
-      require File.expand_path('../vagabund/dotfiles/config', __FILE__)
-      Dotfiles::Config
+    config :squat, :provisioner do
+      require File.expand_path('../vagabund/squatter/config', __FILE__)
+      Squatter::Config
     end
 
-    provisioner :dotfiles do
-      require File.expand_path('../vagabund/dotfiles/provisioner', __FILE__)
-      Dotfiles::Provisioner
+    provisioner :squat do
+      require File.expand_path('../vagabund/squatter/provisioner', __FILE__)
+      Squatter::Provisioner
     end
   end
 end

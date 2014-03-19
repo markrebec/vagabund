@@ -1,4 +1,4 @@
 module Vagabund
-  module Dotfiles
+  module Squatter
   end
 end

@@ -1,10 +1,10 @@
 module Vagabund
-  module Dotfiles
+  module Squatter
     class Provisioner < Vagrant.plugin(2, :provisioner)
 
       def provision
-        config.dotfiles.each do |dotfile|
-          from, to = expanded_paths(dotfile)
+        config.files.each do |file|
+          from, to = expanded_paths(file)
 
           unless File.exists?(from)
             @machine.ui.warn "Config file #{from} does not exist. Skipping."
@@ -17,15 +17,15 @@ module Vagabund
 
       protected
 
-      def expanded_paths(dotfile)
-        if dotfile.is_a?(Array) # separate source and destination, both expanded relative to home if not absolute
-          from = Pathname.new(dotfile[0]).absolute? ? dotfile[0] : File.expand_path(File.join(config.host_home, dotfile[0]))
-          to = Pathname.new(dotfile[1]).absolute? ? dotfile[1] : File.expand_path(File.join(config.host_home, dotfile[1]))
-        elsif Pathname.new(dotfile).absolute? # already absolute
-          from = to = dotfile
+      def expanded_paths(file)
+        if file.is_a?(Array) # separate source and destination, both expanded relative to home if not absolute
+          from = Pathname.new(file[0]).absolute? ? file[0] : File.expand_path(File.join(config.host_home, file[0]))
+          to = Pathname.new(file[1]).absolute? ? file[1] : File.expand_path(File.join(config.host_home, file[1]))
+        elsif Pathname.new(file).absolute? # already absolute
+          from = to = file
         else # expand path relative to home
-          from = File.expand_path(File.join(config.host_home, dotfile))
-          to = File.expand_path(File.join(config.guest_home, dotfile))
+          from = File.expand_path(File.join(config.host_home, file))
+          to = File.expand_path(File.join(config.guest_home, file))
         end
 
         [from, to]

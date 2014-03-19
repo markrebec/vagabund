@@ -1,22 +1,20 @@
 module Vagabund
-  module Dotfiles
+  module Squatter
     class Config < Vagrant.plugin(2, :config)
       attr_accessor :guest_home, :host_home
 
-      DEFAULT_DOTFILES = ['.vimrc', '.viminfo', '.gitconfig', '.ssh/known_hosts']
+      DEFAULT_FILES = ['.vimrc', '.viminfo', '.gitconfig', '.ssh/known_hosts']
 
-      def dotfiles
-        @dotfiles ||= DEFAULT_DOTFILES
+      def files
+        @files ||= DEFAULT_FILES
       end
-      alias_method :files, :dotfiles
 
-      def dotfiles=(file_arr)
-        @dotfiles = file_arr
+      def files=(file_arr)
+        @files = file_arr
       end
-      alias_method :files=, :dotfiles=
 
       def file=(filename)
-        dotfiles << filename
+        files << filename
       end
 
       # TODO these should be guest/host OS agnostic
