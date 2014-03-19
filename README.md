@@ -3,6 +3,18 @@ Vagabund
 
 Vagrant plugin for Forth Rail environments. Provides automatic config management, git operations and the ability to checkout Forth Rail projects and manage services.
 
+# Features
+
+## `:dotfiles` Provisioner
+
+Copies all your personal config files over to the VM automatically to make it feel more like home.
+
+You can configure the host and guest home directories and override or add to the list of config files to be copied. Any relative paths provided will be relative to the home directories, while absolute paths will be preserved. *Files do not have to be 'dotfiles' (do not have to begin with a `.`).* Wildcard operators are not currently supported.
+
+The default list of config files includes `.vimrc`, `.viminfo`, `.gitconfig` and `.ssh/known_hosts`
+
+See this project's `Vagrantfile` for example configuration options.
+
 # Development
 
 Make sure you read the documentation at [http://docs.vagrantup.com/v2/plugins/index.html](http://docs.vagrantup.com/v2/plugins/index.html) to familiarize yourself with basic usage and development practices for vagrant plugins.
@@ -15,4 +27,4 @@ If you want to use the `forthrail/precise64` base box, normally you would login 
 
     $ bundle exec vagrant box add vagabund-test-box https://s3.amazonaws.com/forth-rail-devops/vagrant/boxes/forthrail-precise64-0.1.0-virtualbox.box
 
-
+From here you can use `bundle exec vagrant` as you normally would, which will use the bundled version of vagrant (instead of the system vagrant) and include this plugin automatically.
