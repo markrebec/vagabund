@@ -5,7 +5,7 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "forthrail/precise64"
+  config.vm.box = "vagabund-test-box"
 
   config.ssh.forward_agent = true
 
