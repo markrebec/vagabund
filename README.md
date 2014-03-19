@@ -3,17 +3,19 @@ Vagabund
 
 Vagrant plugin for Forth Rail environments. Provides automatic config management, git operations and the ability to checkout Forth Rail projects and manage services.
 
-## Features
+## Usage
 
 ### `:dotfiles` provisioner
 
 Copies all your personal config files over to the VM automatically to make it feel more like home.
 
-You can configure the host and guest home directories and override or add to the list of config files to be copied. Any relative paths provided will be relative to the home directories, while absolute paths will be preserved. *Files do not have to be 'dotfiles' (do not have to begin with a `.`).* Wildcard operators are not currently supported.
+You can configure the host and guest home directories and override or add to the list of config files to be copied. Any relative paths provided will be relative to the home directories, while absolute paths will be preserved. *Files do not have to be "dotfiles" (do not have to begin with a `.`).* 
 
-The default list of config files includes `.vimrc`, `.viminfo`, `.gitconfig` and `.ssh/known_hosts`
+Really, this can be used to copy any files/directories from the guest to the host, not just "config files". Wildcard operators are not currently supported.
 
-See this project's `Vagrantfile` for example configuration options.
+The default list of config files includes `~/.vimrc`, `~/.viminfo`, `~/.gitconfig` and `~/.ssh/known_hosts`
+
+See the example block passed to `config.vm.provision :dotfiles` in this project's `Vagrantfile` for example configuration options.
 
 ## Development
 
