@@ -3,9 +3,9 @@ Vagabund
 
 Vagrant plugin for Forth Rail environments. Provides automatic config management, git operations and the ability to checkout Forth Rail projects and manage services.
 
-# Features
+## Features
 
-## `:dotfiles` Provisioner
+### `:dotfiles` provisioner
 
 Copies all your personal config files over to the VM automatically to make it feel more like home.
 
@@ -15,11 +15,11 @@ The default list of config files includes `.vimrc`, `.viminfo`, `.gitconfig` and
 
 See this project's `Vagrantfile` for example configuration options.
 
-# Development
+## Development
 
 Make sure you read the documentation at [http://docs.vagrantup.com/v2/plugins/index.html](http://docs.vagrantup.com/v2/plugins/index.html) to familiarize yourself with basic usage and development practices for vagrant plugins.
 
-## Test Box
+### Test Box
 
 The default `Vagrantfile` points to a box called `vagabund-test-box` and uses the VirtualBox provider. You will need to add the box manually with `vagrant box add` or edit the `Vagrantfile` to point to an available base box (**but do not commit your changes**). You can use any base box you'd like to test, but it is recommended you use the latest `forthrail/precise64` box available.
 
