@@ -6,3 +6,5 @@ module Vagabund
 end
 
 require_relative 'sources/git' 
+require_relative 'sources/url' 
+require_relative 'sources/local'
