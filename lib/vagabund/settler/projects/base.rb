@@ -34,13 +34,6 @@ module Vagabund
           end
         end
 
-        #def chdir(&block)
-        #  target_path = File.directory?(@target_path) ? @target_path : File.dirname(@target_path)
-        #  raise Vagrant::Errors::VagrantError, :project_path_does_not_exist unless File.exists?(target_path)
-        #  
-        #  Dir.chdir target_path, &block
-        #end
-      
       end
     end
   end
