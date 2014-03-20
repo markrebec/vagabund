@@ -57,7 +57,11 @@ module Vagabund
               begin
                 machine.communicate.execute "cd #{File.dirname(local_file)}; tar xf #{local_file} #{File.basename(local_file, local_ext)} -C #{build_path}"
               rescue
-                machine.communicate.execute "cd #{File.dirname(local_file)}; tar xf #{local_file} -C #{build_path}"
+                begin
+                  machine.communicate.execute "cd #{File.dirname(local_file)}; tar xf #{local_file} #{name}-#{version} -C #{build_path}"
+                rescue
+                  machine.communicate.execute "cd #{File.dirname(local_file)}; tar xf #{local_file} -C #{build_path}"
+                end
               end
             end
           
