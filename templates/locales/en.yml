@@ -1,0 +1,6 @@
+en:
+  vagrant:
+    errors:
+      missing_project_path: "A project path is required."
+      invalid_projects_config: "Vagabund::Settler provisioner config option `projects` must be an array"
+      project_path_does_not_exist: "The project path does not exist"
