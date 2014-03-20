@@ -99,7 +99,7 @@ module Vagabund
             @source = Sources::Git.new(@options.git)
           elsif @options.respond_to?(:url)
             @source = Sources::Url.new(@options.url)
-          elsif @options.respond_to?(:file)
+          elsif @options.respond_to?(:local)
             @source = Sources::Local.new(@options.local)
           #elsif @options.respond_to?(:scp)
             # remote scp
