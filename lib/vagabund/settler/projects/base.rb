@@ -2,7 +2,7 @@ module Vagabund
   module Settler
     module Projects
       class Base
-        attr_reader :options, :source
+        attr_reader :options, :source, :target_path
 
         def prepare(machine)
           pull machine
