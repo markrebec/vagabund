@@ -98,6 +98,11 @@ module Vagabund
         end
 
         def extract_package(machine)
+          if build_path_exists?(machine)
+            machine.ui.warn "Build path #{build_path} already exists, using it for the build. If you would like to use a clean source tree, you should manually remove it and run `vagrant provision` again."
+            return build_path
+          end
+
           if File.directory?(local_file)
             machine.communicate.execute "cp -r #{local_file} #{build_path}" if local_file != build_path
           else
@@ -140,8 +145,29 @@ module Vagabund
         end
 
         def pull_package(machine)
-          machine.communicate.sudo "rm -rf #{local_file} #{build_path}"
-          source.pull machine, local_file
+          if package_exists?(machine)
+            @local_file = existing_package_file(machine)
+            machine.ui.warn "Package #{local_file} already exists, using it for the build. If you would like to re-download the package, you should manually remove it then run `vagrant provision` again."
+          else
+            source.pull machine, local_file
+          end
+        end
+        
+        def build_path_exists?(machine)
+          return machine.communicate.test("[ -d #{build_path} ]") ? true : false
+        end
+
+        def package_exists?(machine)
+          return machine.communicate.test("[ -f #{existing_package_file(machine)} ]") ? true : false
+        end
+
+        def existing_package_file(machine)
+          pkg_file = local_file
+
+          while !machine.communicate.test("[ -f #{pkg_file} ]") && !File.extname(pkg_file).empty? do
+            pkg_file = File.join(File.dirname(pkg_file), File.basename(pkg_file, File.extname(pkg_file)))
+          end
+          pkg_file
         end
 
       end
