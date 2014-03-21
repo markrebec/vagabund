@@ -15,6 +15,18 @@ module Vagabund
             machine.ui.info "Building package #{name}-#{version} in #{build_path}..."
             build_package machine
           end
+
+          clean machine
+        end
+
+        def clean(machine)
+          if @options.respond_to? :cleaner
+            machine.ui.info "Cleaning up after #{name}-#{version} with custom cleaner..."
+            @options.cleaner.call(self, machine, machine.communicate)
+          else
+            machine.ui.info "Cleaning up after #{name}-#{version}..."
+            clean_package machine
+          end
         end
 
         def extract(machine)
@@ -79,6 +91,10 @@ module Vagabund
           rescue
             raise Vagrant::Errors::VagrantError, :package_build_error
           end
+        end
+
+        def clean_package(machine)
+          machine.communicate.sudo "rm -rf #{local_file} #{build_path}"
         end
 
         def extract_package(machine)
