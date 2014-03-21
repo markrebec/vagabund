@@ -11,7 +11,7 @@ module Vagabund
         protected
 
         def bundle(machine)
-          machine.ui.info "Bundling ruby project in #{@target_path}..."
+          machine.ui.detail "Bundling ruby project in #{@target_path}..."
           machine.communicate.execute "cd #{@target_path}; bundle install"
         end
 

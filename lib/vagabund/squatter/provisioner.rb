@@ -33,7 +33,7 @@ module Vagabund
 
       def upload(from, to)
         begin
-          @machine.ui.info "Uploading #{from} to #{to}..."
+          @machine.ui.detail "Uploading #{from} to #{to}..."
           @machine.communicate.execute "mkdir -p #{File.dirname(to)}" # TODO this should be guest OS agnostic
           @machine.communicate.upload from, to
         rescue Vagrant::Errors::VagrantError => e
