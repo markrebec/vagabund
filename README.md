@@ -80,6 +80,8 @@ For ruby/rails projects your gem dependencies will be automatically installed fo
 
 Make sure you read the documentation at [http://docs.vagrantup.com/v2/plugins/index.html](http://docs.vagrantup.com/v2/plugins/index.html) to familiarize yourself with basic usage and development practices for vagrant plugins.
 
+**Note:** If you `bundle install` without specifying a `--path` the rubygems version of the `vagrant` binary might override your installed version, even outside of this project's directory.  It is suggested you `bundle install --path ./.bundle` so you can use `bundle exec vagrant` while working on this plugin, but it won't interfere with your installed vagrant.
+
 ### Test Box
 
 The default `Vagrantfile` points to a box called `vagabund-test-box` and uses the VirtualBox provider. You will need to add the box manually with `vagrant box add` or edit the `Vagrantfile` to point to an available base box (**but do not commit your changes**). You can use any base box you'd like to test, but it is recommended you use the latest `forthrail/precise64` box available.
