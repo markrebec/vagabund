@@ -63,6 +63,10 @@ module Vagabund
           @build_path ||= "/tmp/#{name}-#{version}"
         end
 
+        def apply_block(&block)
+          yield @options
+        end
+
         protected
 
         #
@@ -76,7 +80,7 @@ module Vagabund
         #   scp: '[user@]example.com:/path/to/file' # this might require ssh forwarding
         def initialize(*args, &block)
           @options = OpenStruct.new(args.extract_options!)
-          yield @options if block_given?
+          apply_block &block if block_given?
 
           @name = args.shift
           @version = args.shift
