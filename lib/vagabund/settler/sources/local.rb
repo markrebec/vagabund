@@ -5,7 +5,7 @@ module Vagabund
         attr_reader :origin
         
         def upload(machine, target_path)
-          machine.ui.info "Uploading #{origin} to #{target_path}..."
+          machine.ui.detail "Uploading #{origin} to #{target_path}..."
           machine.communicate.execute "mkdir -p #{File.dirname(target_path)}"
           machine.communicate.upload origin, target_path
           target_path

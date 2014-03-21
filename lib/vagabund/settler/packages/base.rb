@@ -10,10 +10,10 @@ module Vagabund
 
           begin
             if @options.respond_to? :builder
-              machine.ui.info "Building package #{name}-#{version} with custom builder..."
+              machine.ui.detail "Building package #{name}-#{version} with custom builder..."
               @options.builder.call(self, machine, machine.communicate)
             else
-              machine.ui.info "Building package #{name}-#{version} in #{build_path}..."
+              machine.ui.detail "Building package #{name}-#{version} in #{build_path}..."
               build_package machine
             end
           rescue StandardError => e
@@ -25,20 +25,20 @@ module Vagabund
 
         def clean(machine)
           if @options.respond_to? :cleaner
-            machine.ui.info "Cleaning up after #{name}-#{version} with custom cleaner..."
+            machine.ui.detail "Cleaning up after #{name}-#{version} with custom cleaner..."
             @options.cleaner.call(self, machine, machine.communicate)
           else
-            machine.ui.info "Cleaning up after #{name}-#{version}..."
+            machine.ui.detail "Cleaning up after #{name}-#{version}..."
             clean_package machine
           end
         end
 
         def extract(machine)
           if @options.respond_to? :extractor
-            machine.ui.info "Unpacking #{local_file} with custom extractor..."
+            machine.ui.detail "Unpacking #{local_file} with custom extractor..."
             @options.extractor.call(self, machine, machine.communicate)
           else
-            machine.ui.info "Unpacking #{local_file}..."
+            machine.ui.detail "Unpacking #{local_file}..."
             extract_package machine
           end
         rescue StandardError => e
