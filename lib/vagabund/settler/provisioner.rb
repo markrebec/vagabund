@@ -8,11 +8,19 @@ module Vagabund
 
       def provision
         config.packages.each do |package|
-          package.build @machine
+          begin
+            package.build @machine
+          rescue
+            machine.ui.error "Package #{package.name}-#{package.version} failed to build!"
+          end
         end
         
         config.projects.each do |project|
-          project.prepare @machine
+          begin
+            project.prepare @machine
+          rescue
+            machine.ui.error "Project #{project.target_path} failed to build!"
+          end
         end
       end
 
