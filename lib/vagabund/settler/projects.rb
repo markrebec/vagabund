@@ -1,3 +1,4 @@
+require_relative 'errors'
 require_relative 'projects/base'
 require_relative 'projects/ruby'
 require_relative 'projects/rails'

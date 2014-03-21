@@ -1,8 +1,13 @@
 en:
   vagrant:
     errors:
-      package_build_error: "Package build failed using default build instructions: './configure && make && make install'"
       invalid_packages_config: "Vagabund::Settler provisioner config option `packages` must be an array"
       missing_project_path: "A project path is required."
       invalid_projects_config: "Vagabund::Settler provisioner config option `projects` must be an array"
       project_path_does_not_exist: "The project path does not exist"
+  vagabund:
+    settler:
+      errors:
+        package_build_error: "Package failed at the build stage"
+        package_extraction_error: "Package failed at the extraction stage"
+        package_pull_error: "Package failed at the download stage"

@@ -8,12 +8,16 @@ module Vagabund
           pull machine
           extract machine
 
-          if @options.respond_to? :builder
-            machine.ui.info "Building package #{name}-#{version} with custom builder..."
-            @options.builder.call(self, machine, machine.communicate)
-          else
-            machine.ui.info "Building package #{name}-#{version} in #{build_path}..."
-            build_package machine
+          begin
+            if @options.respond_to? :builder
+              machine.ui.info "Building package #{name}-#{version} with custom builder..."
+              @options.builder.call(self, machine, machine.communicate)
+            else
+              machine.ui.info "Building package #{name}-#{version} in #{build_path}..."
+              build_package machine
+            end
+          rescue StandardError => e
+            raise Settler::Errors::PackageBuildError, e
           end
 
           clean machine
@@ -37,6 +41,8 @@ module Vagabund
             machine.ui.info "Unpacking #{local_file}..."
             extract_package machine
           end
+        rescue StandardError => e
+          raise Settler::Errors::PackageExtractionError, e
         end
 
         def pull(machine)
@@ -45,6 +51,8 @@ module Vagabund
           else
             pull_package machine
           end
+        rescue StandardError => e
+          raise Settler::Errors::PackagePullError, e
         end
 
         def local_file
@@ -85,12 +93,8 @@ module Vagabund
         end
 
         def build_package(machine)
-          begin
-            machine.communicate.execute "cd #{build_path}; ./configure && make"
-            machine.communicate.sudo "cd #{build_path}; make install"
-          rescue
-            raise Vagrant::Errors::VagrantError, :package_build_error
-          end
+          machine.communicate.execute "cd #{build_path}; ./configure && make"
+          machine.communicate.sudo "cd #{build_path}; make install"
         end
 
         def clean_package(machine)
