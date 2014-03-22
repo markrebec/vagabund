@@ -9,5 +9,7 @@ en:
     settler:
       errors:
         package_build_error: "Package failed at the build stage"
+        package_clean_error: "Package was installed successfully but failed at the clean up stage"
         package_extraction_error: "Package failed at the extraction stage"
+        package_install_error: "Package failed at the install stage"
         package_pull_error: "Package failed at the download stage"

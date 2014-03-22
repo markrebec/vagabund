@@ -10,7 +10,7 @@ module Vagabund
         def add_package(*args, &block)
           if args.first.is_a?(Packages::Base)
             pkg = args.shift
-            pkg.apply_block &block if block_given?
+            pkg.configure &block if block_given?
             packages << pkg
           else
             add_package Package.new(*args, &block)
@@ -20,7 +20,11 @@ module Vagabund
         alias_method :package=, :add_package
 
         def method_missing(meth, *args, &block)
-          packages.send(meth, *args, &block)
+          packages.send meth, *args, &block
+        end
+        
+        def respond_to_missing?(meth, include_private=false)
+          packages.respond_to? meth, include_private
         end
 
         protected

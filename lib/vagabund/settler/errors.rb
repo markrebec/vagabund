@@ -24,9 +24,17 @@ module Vagabund
       class PackageBuildError < PackageError
         error_key :package_build_error
       end
+      
+      class PackageCleanError < PackageError
+        error_key :package_clean_error
+      end
 
       class PackageExtractionError < PackageError
         error_key :package_extraction_error
+      end
+      
+      class PackageInstallError < PackageError
+        error_key :package_install_error
       end
       
       class PackagePullError < PackageError

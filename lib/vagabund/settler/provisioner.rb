@@ -10,7 +10,7 @@ module Vagabund
         config.packages.each do |package|
           begin
             machine.ui.info "Provisioning package #{package.name}-#{package.version}..."
-            package.build @machine
+            package.provision @machine
           rescue Vagrant::Errors::VagrantError => e
             machine.ui.error "Failed to provision package #{package.name}-#{package.version}!"
             machine.ui.detail e.message(false)
