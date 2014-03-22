@@ -3,6 +3,8 @@ module Vagabund
     module Packages
       class PackageConfig
         attr_reader :config
+
+        PACKAGE_EXTENSIONS = ['.gz', '.bz', '.bz2', '.xz', '.zip', '.tar', '.tgz', '.tbz', '.tbz2', '.txz']
         
         BUILDER = Proc.new do |package, machine, channel|
           channel.execute "cd #{build_path}; ./configure && make"
@@ -18,31 +20,30 @@ module Vagabund
           elsif File.directory?(local_file)
             channel.execute "cp -r #{local_file} #{build_path}" if local_file != build_path
           else
+            channel.execute "mkdir -p #{build_path}"
             local_ext = File.extname(local_file)
 
-            # TODO this should better handle different combinations. For example right now a .tar.zip wouldn't work, a .gz wouldn't work, but a .zip or a .tar.gz DOES work
             case local_ext
-            when '.gz', '.bz', '.bz2', '.xz'
-              channel.sudo "rm -rf #{File.join(File.dirname(local_file), File.basename(local_file, local_ext))}"
-              
-              case local_ext
-              when '.gz'
-                channel.execute "cd #{File.dirname(local_file)}; gunzip #{local_file}"
-              when '.bz', '.bz2'
-                channel.execute "cd #{File.dirname(local_file)}; bunzip2 #{local_file}"
-              when '.xz'
-                channel.execute "cd #{File.dirname(local_file)}; xz -d #{local_file}"
-              end
-              
-              @local_file = File.join(File.dirname(local_file), File.basename(local_file, local_ext))
-              extract(machine) if ['.gz', '.bz', '.bz2', '.xz', '.zip', '.tar'].include?(File.extname(local_file))
+            when '.gz'
+              channel.execute "cd #{File.dirname(local_file)}; gzip -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}"
+            when '.tgz'
+              channel.execute "cd #{File.dirname(local_file)}; gzip -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}.tar"
+            when '.bz', '.bz2'
+              channel.execute "cd #{File.dirname(local_file)}; bzip2 -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}"
+            when '.tbz', '.tbz2'
+              channel.execute "cd #{File.dirname(local_file)}; bzip2 -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}.tar"
+            when '.xz'
+              channel.execute "cd #{File.dirname(local_file)}; xz -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}"
+            when '.txz'
+              channel.execute "cd #{File.dirname(local_file)}; xz -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}.tar"
             when '.zip'
               channel.execute "cd #{File.dirname(local_file)}; unzip #{local_file} -d #{build_path}"
               channel.execute("cd #{build_path}; mv #{File.basename(local_file, local_ext)}/* ./") rescue nil
               channel.execute("cd #{build_path}; mv #{File.basename(local_file, local_ext)}/.* ./") rescue nil
+              channel.execute("cd #{build_path}; mv #{name}-#{version}/* ./") rescue nil
+              channel.execute("cd #{build_path}; mv #{name}-#{version}/.* ./") rescue nil
               channel.execute("cd #{build_path}; rm -rf #{File.basename(local_file, local_ext)}") rescue nil
             when '.tar'
-              channel.execute "mkdir -p #{build_path}"
               begin
                 channel.execute "cd #{File.dirname(local_file)}; tar xf #{local_file} #{File.basename(local_file, local_ext)} -C #{build_path}"
               rescue
@@ -53,6 +54,22 @@ module Vagabund
                 end
               end
             end
+
+            build_files = ""
+            channel.execute "cd #{build_path}; ls" do |type, data|
+              build_files = data
+            end
+
+            if build_files.split($/).length == 1
+              new_package_file = File.basename(build_files.chomp)
+              if PACKAGE_EXTENSIONS.include?(File.extname(new_package_file))
+                channel.execute "mv #{File.join(build_path, new_package_file)} #{File.dirname(local_file)}"
+                channel.sudo    "rm -rf #{local_file} #{build_path}"
+                @local_file = File.join(File.dirname(local_file), new_package_file)
+                extract(machine)
+              end
+            end
+            
           end
         end
         
