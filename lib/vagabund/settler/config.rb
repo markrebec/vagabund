@@ -33,6 +33,11 @@ module Vagabund
         projects << prj
       end
 
+      def initialize
+        super
+        Dir['packages/**/*.rb'].each { |package| eval(IO.read(package)) }
+      end
+
     end
   end
 end
