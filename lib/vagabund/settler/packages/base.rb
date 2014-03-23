@@ -25,7 +25,7 @@ module Vagabund
 
         def build(machine)
           exec_before :build, machine
-          machine.ui.detail "Building package #{name}-#{version}..."
+          machine.ui.detail "Building #{name}-#{version}..."
           action_exec config.builder, machine
           exec_after :build, machine
         rescue StandardError => e
@@ -111,16 +111,21 @@ module Vagabund
           end
         end
 
-        def local_file
-          @local_file ||= "/tmp/#{File.basename(source.origin)}"
-        end
-
-        def build_path
-          @build_path ||= "/tmp/#{name}-#{version}"
-        end
-
         def configure(&block)
           config.configure &block
+        end
+
+        def local_package
+          config.local_package
+        end
+        alias_method :local_file, :local_package
+
+        def build_path
+          config.build_path
+        end
+
+        def build_root
+          config.build_root
         end
 
         def name
@@ -174,7 +179,7 @@ module Vagabund
           pkg_file = local_file
 
           while !machine.communicate.test("[ -f #{pkg_file} ]") && !File.extname(pkg_file).empty? do
-            pkg_file = File.join(File.dirname(pkg_file), File.basename(pkg_file, File.extname(pkg_file)))
+            pkg_file = File.join(build_root, File.basename(pkg_file, File.extname(pkg_file)))
           end
           pkg_file
         end

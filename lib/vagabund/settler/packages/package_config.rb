@@ -4,10 +4,14 @@ module Vagabund
       class PackageConfig
         attr_reader :config, :source
         
+        # Bit of metaprogramming to define methods like builder, installer,
+        # before_build, after_install, etc.
         %w(package builder cleaner extractor installer puller).each do |action|
           %w(before after).each do |hook|
             hook_action = "#{hook}_#{action.gsub(/[eo]r$/, '')}"
 
+            # Defines before/after 'hook' methods for each action: before_build,
+            # before_pull, after_install, etc.
             define_method hook_action.to_sym do |*args, &block|
               if args.first.is_a?(String)
                 command = args.shift
@@ -42,6 +46,8 @@ module Vagabund
             next
           end
 
+          # Defines custom action methods to override the built-in puller,
+          # extractor, builder, installer and cleaner.
           define_method action.to_sym do |*args, &block|
             if args.first.is_a?(String)
               command = args.shift
@@ -63,6 +69,19 @@ module Vagabund
           alias_method "#{action}=".to_sym, action.to_sym
           alias_method "#{action.gsub(/[eo]r$/, '')}_with".to_sym, action.to_sym
         end
+
+        def build_root
+          config.build_root ||= "/tmp/#{name}-#{version}"
+        end
+
+        def build_path
+          config.build_path ||= File.join(build_root, "#{name}-#{version}")
+        end
+
+        def local_package
+          config.local_package ||= File.join(build_root, File.basename(source.origin))
+        end
+        alias_method :local_file, :local_package
 
         def configure(&block)
           instance_eval &block if block_given?

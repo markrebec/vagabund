@@ -14,7 +14,7 @@ module Vagabund
       end
 
       CLEANER = Proc.new do |package, machine, channel|
-        channel.sudo "rm -rf #{local_file} #{build_path}"
+        channel.sudo "rm -rf #{build_root}"
       end
 
       EXTRACTOR = Proc.new do |package, machine, channel|
@@ -28,19 +28,19 @@ module Vagabund
 
           case local_ext
           when '.gz'
-            channel.execute "cd #{File.dirname(local_file)}; gzip -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}"
+            channel.execute "cd #{build_root}; gzip -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}"
           when '.tgz'
-            channel.execute "cd #{File.dirname(local_file)}; gzip -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}.tar"
+            channel.execute "cd #{build_root}; gzip -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}.tar"
           when '.bz', '.bz2'
-            channel.execute "cd #{File.dirname(local_file)}; bzip2 -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}"
+            channel.execute "cd #{build_root}; bzip2 -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}"
           when '.tbz', '.tbz2'
-            channel.execute "cd #{File.dirname(local_file)}; bzip2 -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}.tar"
+            channel.execute "cd #{build_root}; bzip2 -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}.tar"
           when '.xz'
-            channel.execute "cd #{File.dirname(local_file)}; xz -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}"
+            channel.execute "cd #{build_root}; xz -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}"
           when '.txz'
-            channel.execute "cd #{File.dirname(local_file)}; xz -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}.tar"
+            channel.execute "cd #{build_root}; xz -dc #{local_file} > #{build_path}/#{File.basename(local_file, local_ext)}.tar"
           when '.zip'
-            channel.execute "cd #{File.dirname(local_file)}; unzip #{local_file} -d #{build_path}"
+            channel.execute "cd #{build_root}; unzip #{local_file} -d #{build_path}"
             channel.execute("cd #{build_path}; mv #{File.basename(local_file, local_ext)}/* ./") rescue nil
             channel.execute("cd #{build_path}; mv #{File.basename(local_file, local_ext)}/.* ./") rescue nil
             channel.execute("cd #{build_path}; mv #{name}-#{version}/* ./") rescue nil
@@ -48,12 +48,12 @@ module Vagabund
             channel.execute("cd #{build_path}; rm -rf #{File.basename(local_file, local_ext)}") rescue nil
           when '.tar'
             begin
-              channel.execute "cd #{File.dirname(local_file)}; tar xf #{local_file} #{File.basename(local_file, local_ext)} -C #{build_path}"
+              channel.execute "cd #{build_root}; tar xf #{local_file} #{File.basename(local_file, local_ext)} -C #{build_path}"
             rescue
               begin
-                channel.execute "cd #{File.dirname(local_file)}; tar xf #{local_file} #{name}-#{version} -C #{build_path}"
+                channel.execute "cd #{build_root}; tar xf #{local_file} #{name}-#{version} -C #{build_path}"
               rescue
-                channel.execute "cd #{File.dirname(local_file)}; tar xf #{local_file} -C #{build_path}"
+                channel.execute "cd #{build_root}; tar xf #{local_file} -C #{build_path}"
               end
             end
           end
@@ -66,9 +66,9 @@ module Vagabund
           if build_files.split($/).length == 1
             new_package_file = File.basename(build_files.chomp)
             if Package::EXTENSIONS.include?(File.extname(new_package_file))
-              channel.execute "mv #{File.join(build_path, new_package_file)} #{File.dirname(local_file)}"
+              channel.execute "mv #{File.join(build_path, new_package_file)} #{build_root}"
               channel.sudo    "rm -rf #{local_file} #{build_path}"
-              @local_file = File.join(File.dirname(local_file), new_package_file)
+              config.local_file = File.join(build_root, new_package_file)
               extract(machine)
             end
           end
@@ -82,7 +82,7 @@ module Vagabund
 
       PULLER = Proc.new do |package, machine, channel|
         if package_exists?(machine)
-          @local_file = existing_package_file(machine)
+          config.local_file = existing_package_file(machine)
           machine.ui.warn "Package #{local_file} already exists, using it for the build. If you would like to re-download the package, you should manually remove it then run `vagrant provision` again."
         else
           source.pull machine, local_file
