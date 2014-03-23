@@ -7,17 +7,26 @@ module Vagabund
         attr_reader :name, :version, :config, :source
 
         def provision(machine)
+          exec_before :package, machine
+
+          if skip?
+            machine.ui.warn "Skipping package #{name}-#{version} because skip flag was set."
+            return
+          end
+
           pull machine
           extract machine
           build machine
           install machine
           clean machine
+
+          exec_after :package, machine
         end
 
         def build(machine)
           exec_before :build, machine
           machine.ui.detail "Building package #{name}-#{version}..."
-          action_exec machine, config.builder
+          action_exec config.builder, machine
           exec_after :build, machine
         rescue StandardError => e
           raise Settler::Errors::PackageBuildError, e
@@ -26,7 +35,7 @@ module Vagabund
         def clean(machine)
           exec_before :clean, machine
           machine.ui.detail "Cleaning up after #{name}-#{version}..."
-          action_exec machine, config.cleaner
+          action_exec config.cleaner, machine
           exec_after :clean, machine
         rescue StandardError => e
           raise Settler::Errors::PackageCleanError, e
@@ -35,7 +44,7 @@ module Vagabund
         def extract(machine)
           exec_before :extract, machine
           machine.ui.detail "Unpacking #{local_file}..."
-          action_exec machine, config.extractor
+          action_exec config.extractor, machine
           exec_after :extract, machine
         rescue StandardError => e
           raise Settler::Errors::PackageExtractionError, e
@@ -44,7 +53,7 @@ module Vagabund
         def install(machine)
           exec_before :install, machine
           machine.ui.detail "Installing #{name}-#{version}..."
-          action_exec machine, config.installer
+          action_exec config.installer, machine
           exec_after :install, machine
         rescue StandardError => e
           raise Settler::Errors::PackageInstallError, e
@@ -53,7 +62,7 @@ module Vagabund
         def pull(machine)
           exec_before :pull, machine
           machine.ui.detail "Retrieving sources for #{name}-#{version}..."
-          action_exec machine, config.puller
+          action_exec config.puller, machine
           exec_after :pull, machine
         rescue StandardError => e
           raise Settler::Errors::PackagePullError, e
@@ -73,13 +82,13 @@ module Vagabund
 
           machine.ui.detail "Executing custom :#{hook_action} hooks for package #{name}-#{version}..."
           config.send(hook_action).each do |hact|
-            action_exec machine, hact
+            action_exec hact, machine
           end
         rescue StandardError => e
           raise Settler::Errors::PackageError, e
         end
 
-        def action_exec(machine, command)
+        def action_exec(command, machine)
           self.class.instance_eval do
             [:ask, :detail, :error, :info, :output, :warn].each do |cmd|
               define_method cmd do |*args, &block|
@@ -112,6 +121,16 @@ module Vagabund
 
         def configure(&block)
           config.configure &block
+        end
+
+        def skip(s)
+          @skip = s unless s.nil?
+          @skip
+        end
+        alias_method :skip=, :skip
+
+        def skip?
+          @skip
         end
 
         protected
