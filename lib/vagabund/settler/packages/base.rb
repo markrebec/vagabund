@@ -15,43 +15,68 @@ module Vagabund
         end
 
         def build(machine)
+          exec_before :build, machine
           machine.ui.detail "Building package #{name}-#{version}..."
           action_exec machine, config.builder
-          #instance_exec self, machine, machine.communicate, &config.builder
+          exec_after :build, machine
         rescue StandardError => e
           raise Settler::Errors::PackageBuildError, e
         end
 
         def clean(machine)
+          exec_before :clean, machine
           machine.ui.detail "Cleaning up after #{name}-#{version}..."
           action_exec machine, config.cleaner
-          #instance_exec self, machine, machine.communicate, &config.cleaner
+          exec_after :clean, machine
         rescue StandardError => e
           raise Settler::Errors::PackageCleanError, e
         end
 
         def extract(machine)
+          exec_before :extract, machine
           machine.ui.detail "Unpacking #{local_file}..."
           action_exec machine, config.extractor
-          #instance_exec self, machine, machine.communicate, &config.extractor
+          exec_after :extract, machine
         rescue StandardError => e
           raise Settler::Errors::PackageExtractionError, e
         end
 
         def install(machine)
+          exec_before :install, machine
           machine.ui.detail "Installing #{name}-#{version}..."
           action_exec machine, config.installer
-          #instance_exec self, machine, machine.communicate, &config.installer
+          exec_after :install, machine
         rescue StandardError => e
           raise Settler::Errors::PackageInstallError, e
         end
 
         def pull(machine)
+          exec_before :pull, machine
           machine.ui.detail "Retrieving sources for #{name}-#{version}..."
           action_exec machine, config.puller
-          #instance_exec self, machine, machine.communicate, &config.puller
+          exec_after :pull, machine
         rescue StandardError => e
           raise Settler::Errors::PackagePullError, e
+        end
+
+        def exec_before(action, machine)
+          hook_exec :before, action, machine
+        end
+
+        def exec_after(action, machine)
+          hook_exec :after, action, machine
+        end
+
+        def hook_exec(hook, action, machine)
+          hook_action = "#{hook.to_s}_#{action.to_s.gsub(/[eo]r$/, '')}"
+          return if config.send(hook_action).nil? || config.send(hook_action).empty?
+
+          machine.ui.detail "Executing custom :#{hook_action} hooks for package #{name}-#{version}..."
+          config.send(hook_action).each do |hact|
+            action_exec machine, hact
+          end
+        rescue StandardError => e
+          raise Settler::Errors::PackageError, e
         end
 
         def action_exec(machine, command)
