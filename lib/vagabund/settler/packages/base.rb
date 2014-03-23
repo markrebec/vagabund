@@ -4,7 +4,7 @@ module Vagabund
   module Settler
     module Packages
       class Base
-        attr_reader :name, :version, :config, :source
+        attr_reader :config
 
         def provision(machine)
           exec_before :package, machine
@@ -123,6 +123,18 @@ module Vagabund
           config.configure &block
         end
 
+        def name
+          config.name
+        end
+
+        def version
+          config.version
+        end
+
+        def source
+          config.source
+        end
+
         def skip(s)
           @skip = s unless s.nil?
           @skip
@@ -145,20 +157,9 @@ module Vagabund
         #   url: 'ftp://user:pass@example.com/path/to/file'
         #   scp: '[user@]example.com:/path/to/file' # this might require ssh forwarding
         def initialize(*args, &block)
-          @config = PackageConfig.new(args.extract_options!, &block)
-
-          @name = args.shift
-          @version = args.shift
-
-          if config.respond_to?(:git)
-            @source = Sources::Git.new(config.git)
-          elsif config.respond_to?(:url)
-            @source = Sources::Url.new(config.url)
-          elsif config.respond_to?(:local)
-            @source = Sources::Local.new(config.local)
-          #elsif config.respond_to?(:scp)
-            # remote scp
-          end
+          opts = args.extract_options!
+          opts = {name: args.shift, version: args.shift}.merge(opts)
+          @config = PackageConfig.new(opts, &block)
         end
 
         def build_path_exists?(machine)
