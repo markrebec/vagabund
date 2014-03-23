@@ -80,7 +80,26 @@ module Vagabund
         end
 
         def action_exec(machine, command)
+          self.class.instance_eval do
+            [:ask, :detail, :error, :info, :output, :warn].each do |cmd|
+              define_method cmd do |*args, &block|
+                machine.ui.send cmd, *args, &block
+              end
+            end
+            [:execute, :sudo, :test].each do |cmd|
+              define_method cmd do |*args, &block|
+                machine.communicate.send cmd, *args, &block
+              end
+            end
+          end
+
           instance_exec self, machine, machine.communicate, &command if command.is_a?(Proc)
+
+          self.class.instance_eval do
+            [:ask, :detail, :error, :info, :output, :warn, :execute, :sudo, :test].each do |cmd|
+              undef_method cmd
+            end
+          end
         end
 
         def local_file
