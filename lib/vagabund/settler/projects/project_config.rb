@@ -8,7 +8,7 @@ module Vagabund
         # before_build, after_install, etc.
         %w(project bundler puller).each do |action|
           %w(before after).each do |hook|
-            hook_action = "#{hook}_#{action.gsub(/[eo]r$/, '')}"
+            hook_action = (action == 'bundler') ? "#{hook}_bundle" : "#{hook}_#{action.gsub(/[eo]r$/, '')}"
 
             # Defines before/after 'hook' methods for each action: before_build,
             # before_pull, after_install, etc.
@@ -67,7 +67,7 @@ module Vagabund
             config.send action.to_sym
           end
           alias_method "#{action}=".to_sym, action.to_sym
-          alias_method "#{action.gsub(/[eo]r$/, '')}_with".to_sym, action.to_sym
+          alias_method "#{(action == 'bundle') ? 'bundle' : action.gsub(/[eo]r$/, '')}_with".to_sym, action.to_sym
         end
         
         def projects_path
