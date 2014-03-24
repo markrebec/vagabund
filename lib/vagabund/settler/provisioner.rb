@@ -13,8 +13,8 @@ module Vagabund
             package.provision @machine
           rescue Vagrant::Errors::VagrantError => e
             machine.ui.error "Failed to provision package #{package.name}-#{package.version}!"
-            machine.ui.detail e.message(false)
-            machine.ui.detail "#{e.message} in #{e.backtrace[0]}"
+            machine.ui.error e.message(false), prefix: false
+            machine.ui.detail "#{e.message} in #{[e.backtrace[0..5], '...'].join($/)}", prefix: false
           end
         end
         
@@ -24,7 +24,8 @@ module Vagabund
             project.provision @machine
           rescue Vagrant::Errors::VagrantError => e
             machine.ui.error "Failed to provision project #{project.name}!"
-            machine.ui.detail "#{e.message} in #{e.backtrace[0]}"
+            machine.ui.error e.message(false), prefix: false
+            machine.ui.detail "#{e.message} in #{[e.backtrace[0..5], '...'].join($/)}", prefix: false
           end
         end
       end
