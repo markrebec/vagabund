@@ -81,10 +81,12 @@ module Vagabund
         def project_path
           config.project_path ||= File.join(config.projects_path, name)
         end
+        alias_method :path, :project_path
 
         def project_path=(path)
           config.project_path = path
         end
+        alias_method :path=, :project_path=
 
         def configure(&block)
           instance_eval &block if block_given?
