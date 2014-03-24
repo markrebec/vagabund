@@ -95,9 +95,26 @@ module Vagabund
                 machine.ui.send cmd, *args, &block
               end
             end
+
             [:execute, :sudo, :test].each do |cmd|
               define_method cmd do |*args, &block|
-                machine.communicate.send cmd, *args, &block
+                opts = {verbose: false}.merge(args.extract_options!)
+                if opts[:verbose] == true
+                  machine.communicate.send cmd, *args, opts do |type,data|
+                    if [:stderr, :stdout].include?(type)
+                      color = type == :stdout ? :green : :red
+                      options = {
+                        color: color,
+                        new_line: false,
+                        prefix: false
+                      }
+
+                      detail(data, options)
+                    end
+                  end
+                else
+                  machine.communicate.send cmd, *args, opts, &block
+                end
               end
             end
           end

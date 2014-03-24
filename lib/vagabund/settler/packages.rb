@@ -10,7 +10,7 @@ module Vagabund
       EXTENSIONS = ['.gz', '.bz', '.bz2', '.xz', '.zip', '.tar', '.tgz', '.tbz', '.tbz2', '.txz']
 
       BUILDER = Proc.new do |package, machine, channel|
-        execute "cd #{build_path}; ./configure && make"
+        execute "cd #{build_path}; ./configure && make", verbose: true
       end
 
       CLEANER = Proc.new do |package, machine, channel|
@@ -80,7 +80,7 @@ module Vagabund
       end
 
       INSTALLER = Proc.new do |package, machine, channel|
-        sudo "cd #{build_path}; make install"
+        sudo "cd #{build_path}; make install", verbose: true
       end
 
       PULLER = Proc.new do |package, machine, channel|
