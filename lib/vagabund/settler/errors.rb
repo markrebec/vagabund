@@ -1,7 +1,7 @@
 module Vagabund
   module Settler
     module Errors
-      class PackageError < Vagrant::Errors::VagrantError
+      class SettlerError < Vagrant::Errors::VagrantError
         attr_reader :original_error
 
         error_namespace "vagabund.settler.errors"
@@ -20,6 +20,9 @@ module Vagabund
           super(*args)
         end
       end
+
+      class PackageError < SettlerError; end
+      class ProjectError < SettlerError; end
 
       class PackageBuildError < PackageError
         error_key :package_build_error
