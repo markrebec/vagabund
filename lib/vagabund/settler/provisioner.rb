@@ -20,10 +20,10 @@ module Vagabund
         
         config.projects.each do |project|
           begin
-            machine.ui.info "Provisioning project #{project.target_path}"
-            project.prepare @machine
+            machine.ui.info "Provisioning project #{project.name}"
+            project.provision @machine
           rescue Vagrant::Errors::VagrantError => e
-            machine.ui.error "Failed to provision project #{project.target_path}!"
+            machine.ui.error "Failed to provision project #{project.name}!"
             machine.ui.detail "#{e.message} in #{e.backtrace[0]}"
           end
         end

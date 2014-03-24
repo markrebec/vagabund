@@ -10,7 +10,8 @@ module Vagabund
 
     class Project < Projects::Base
       def self.new(*args, &block)
-        Projects::Base.new(*args, &block)
+        klass = (args.first.is_a?(Symbol) ? args.shift : :base).to_s.capitalize
+        eval("Projects::#{klass}.new *args, &block")
       end
     end
   end

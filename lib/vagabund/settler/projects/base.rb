@@ -1,37 +1,36 @@
+require_relative 'project_config'
+
 module Vagabund
   module Settler
     module Projects
       class Base
-        attr_reader :options, :source, :target_path
+        attr_reader :config
 
-        def prepare(machine)
+        def name
+          config.name
+        end
+
+        def project_path
+          config.project_path
+        end
+
+        def provision(machine)
           pull machine
         end
 
         def pull(machine)
-          source.pull machine, @target_path
+          config.source.pull machine, project_path
         end
 
         protected
 
         #
-        # Base.new '/path/to/project', {git: 'git@github.com:/user/repo.git'}
+        # Base.new 'my_project', {git: 'git@github.com:/user/repo.git'}
         #
         def initialize(*args, &block)
-          @options = OpenStruct.new(args.extract_options!)
-          yield @options if block_given?
-
-          raise Vagrant::Errors::VagrantError, :missing_project_path unless args.length > 0
-          
-          @target_path = args.shift
-
-          if @options.respond_to?(:git) || (@options.respond_to?(:source) && @options.source.to_sym == :git)
-            @source = Sources::Git.new(@options.git)
-          #elsif @options.respond_to?(:url)
-            # http, ftp
-          #elsif @options.respond_to?(:scp)
-            # scp
-          end
+          opts = args.extract_options!
+          opts = {name: args.shift}.merge(opts)
+          @config = ProjectConfig.new(opts, &block)
         end
 
       end

@@ -1,4 +1,5 @@
 require_relative 'packages/config'
+require_relative 'projects/config'
 
 module Vagabund
   module Settler
@@ -20,22 +21,27 @@ module Vagabund
       alias_method :package, :add_package
       alias_method :package=, :add_package
       
-      def projects
-        @projects ||= []
+      def projects(*args, &block)
+        @projects ||= Projects::Config.new(self, *args)
+        @projects.instance_eval &block if block_given?
+        @projects
       end
 
       def projects=(prjs)
         raise Vagrant::Errors::VagrantError, :invalid_projects_config unless prjs.is_a?(Array)
-        @projects = prjs
+        @projects = Projects::Config.new(self, prjs)
       end
 
-      def project=(prj)
-        projects << prj
+      def add_project(*args, &block)
+        projects.add_project *args, &block
       end
+      alias_method :project, :add_project
+      alias_method :project=, :add_project
 
       def initialize
         super
         Dir['packages/**/*.rb'].each { |package| eval(IO.read(package)) }
+        Dir['projects/**/*.rb'].each { |project| eval(IO.read(project)) }
       end
 
     end
