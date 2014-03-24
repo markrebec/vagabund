@@ -36,7 +36,6 @@ To build and install a software package on the guest OS you add them to your pro
 ```ruby
 config.vm.provision :settle do |settler|
   settler.packages do |packages|
-    
     # Download, extract and build the package using the built-in procs
     package 'epubcheck', '3.0.1', url: 'https://github.com/IDPF/epubcheck/releases/download/v3.0.1/epubcheck-3.0.1.zip'
   
@@ -71,7 +70,6 @@ There is a built-in extractor that will work for most common file types and a bu
 config.vm.provision :settle do |settler|
   settler.packages do |package|
     package 'mydependency', '0.3.0', local: '/local/path/to/mydependency-0.3.0.tar.gz' do |pkg|
-
       # Perform a custom action before provisioning the package
       before do
         installed = true # Maybe check something like `which some_binary`
@@ -124,9 +122,9 @@ There are a number of DSL methods that allow you to pass additional blocks/procs
 
 These each provide three arguments to the block, which are the package itself, the machine, and the channel (which is a shortcut for `machine.communicate`). However there are additionally a few helper methods available within these blocks to facilitate communication with the machine and input/output:
 
-Package: `build_root`, `build_path`, `local_package`
-Communication: `execute`, `sudo`, `test`
-IO: `ask`, `detail`, `error`, `info`, `output`, `warn`
+* Package: `build_root`, `build_path`, `local_package`
+* Communication: `execute`, `sudo`, `test`
+* I/O: `ask`, `detail`, `error`, `info`, `output`, `warn`
 
 #### Projects
 
@@ -211,9 +209,9 @@ There are a number of DSL methods that allow you to pass additional blocks/procs
 
 These each provide three arguments to the block, which are the project itself, the machine, and the channel (which is a shortcut for `machine.communicate`). However there are additionally a few helper methods available within these blocks to facilitate communication with the machine and input/output:
 
-Project: `path`
-Communication: `execute`, `sudo`, `test`
-IO: `ask`, `detail`, `error`, `info`, `output`, `warn`
+* Project: `path`
+* Communication: `execute`, `sudo`, `test`
+* I/O: `ask`, `detail`, `error`, `info`, `output`, `warn`
 
 ## Development
 
