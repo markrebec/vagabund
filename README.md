@@ -31,50 +31,189 @@ You can invoke the provisioner with the following in your `Vagrantfile`:
 
 #### Packages
 
-To build and install a software package on the guest OS you add a `Vagabund::Settler::Package` object within your provisioner config:
+To build and install a software package on the guest OS you add them to your provisioner config:
 
 ```ruby
-  config.vm.provision :settle do |settler|
-    # download, extract and build the package using the built-in builder
-    settler.package = Vagabund::Settler::Package('epubcheck', '3.0.1', url: 'https://github.com/IDPF/epubcheck/releases/download/v3.0.1/epubcheck-3.0.1.zip')
+config.vm.provision :settle do |settler|
+  settler.packages do |packages|
     
-    # upload the local package, extract and build it using the built-in builder
-    settler.package = Vagabund::Settler::Package('mydependency', '0.3.0', local: '/local/path/to/mydependency-0.3.0.tar.gz')
+    # Download, extract and build the package using the built-in procs
+    package 'epubcheck', '3.0.1', url: 'https://github.com/IDPF/epubcheck/releases/download/v3.0.1/epubcheck-3.0.1.zip'
+  
+    # Upload the local package, extract and build it using the built-in procs
+    package 'my_dependency', '0.3.0', local: '/local/path/to/mydependency-0.3.0.tar.gz'
   end
+  
+  # You can also add a package outside a packages config block
+  settler.package 'my_dependency', '0.3.0', local: '/local/path/to/mydependency-0.3.0.tar.gz'
+end
 ```
 
-There is a built-in extractor that will work for most common file types and a builder that performs a simple `./configure && make && make install`, but you can override both of them with your own blocks.
+The supported sources for pulling the package are: `git: GIT_URL`, `local: LOCAL_PATH`, `url: URL`.
+
+You can override the paths where the work is done with a few configuration options, and you can use a block for an advanced configuration DSL:
 
 ```ruby
-  config.vm.provision :settle do |settler|
-    settler.package = Vagabund::Settler::Package('mydependency', '0.3.0', local: '/local/path/to/mydependency-0.3.0.tar.gz') do |pkg|
-      # extract a specific path in a gzipped tar file to the pacakge build_path
-      pkg.extractor = proc do |package, machine, channel|
-        channel.execute "tar xzf #{package.local_file} /mydependency/src -C #{package.build_path}"
-      end
-
-      # perform a custom build and install for the package
-      pkg.builder = proc do |package, machine, channel|
-        channel.execute "cd #{package.build_path}; make"
-        channel.sudo    "cp #{package.build_path}/my_custom_binary /usr/bin"
-      end
+config.vm.provision :settle do |settler|
+  settler.packages do |packages|
+    package 'my_dependency', '0.3.0', local: '/local/path/to/mydependency-0.3.0.tar.gz' do |package|
+      package.build_root = '/some/local/path'               # the path to which the source package will be pulled (default /tmp)
+      package.build_path = '/another/local/path/my_package' # the path where the package will be built (default build_root/name-version)
+      package.local_package = '/some/local/package.tar.gz'  # the path to the local package file (default based on source filename)
     end
   end
+end
 ```
+
+There is a built-in extractor that will work for most common file types and a builder and installer that perform simple `./configure && make` and `make install` commands, but you can override these as well as some other key hooks and actions with your own blocks/procs.
+
+```ruby
+config.vm.provision :settle do |settler|
+  settler.packages do |package|
+    package 'mydependency', '0.3.0', local: '/local/path/to/mydependency-0.3.0.tar.gz' do |pkg|
+
+      # Perform a custom action before provisioning the package
+      before do
+        installed = true # Maybe check something like `which some_binary`
+        
+        # Allows skipping this package if it's already installed
+        skip true if installed
+      end
+      
+      # Custom extractor to extract the pulled package into the build_path
+      extractor do |package, machine, channel|
+        execute "tar xzf #{local_package} /mydependency/src -C #{build_path}"
+      end
+
+      # Perform a custom build and install for the package
+      pkg.builder = proc do |package, machine, channel|
+        execute "cd #{build_path}; make"
+      end
+
+      install_proc = Proc.new do |package, machine, channel|
+        sudo "cp #{build_path}/my_custom_binary /usr/bin"
+      end
+      installer install_proc
+
+      # Or for simple commands, you can pass the command as a string (they will automatically be executed within the build_path)
+      builder "make"
+      installer "cp my_custom_binary /usr/bin", sudo: true
+    end
+  end
+end
+```
+There are a number of DSL methods that allow you to pass additional blocks/procs as package actions or before and after hooks, which will be executed within the context of the package instance:
+
+* `before` - Executed before provisioning the package. Also aliased to `before_package`.
+* `before_pull` - Executed before pulling the package from it's source.
+* `puller` - Override the default behavior for pulling the remote source.
+* `after_pull` - Executed after pulling the package.
+* `before_extract` - Executed before extracting the package.
+* `extractor` - Override the default extractor with your own.
+* `after_extract` - Executed after extracting the package.
+* `before_build` - Executed before building the package.
+* `builder` - Override the default builder with your own.
+* `after_build` - Executed after building the package.
+* `before_install` - Executed before installing the package.
+* `installer` - Override the default installer with your own.
+* `after_install` - Executed after installing the package.
+* `before_clean` - Executed before cleaning up.
+* `cleaner` - Override the default cleaner with your own.
+* `after_clean` - Executed after cleaning up.
+* `after` - Executed after provisioning the package. Also aliased to `after_package`.
+
+These each provide three arguments to the block, which are the package itself, the machine, and the channel (which is a shortcut for `machine.communicate`). However there are additionally a few helper methods available within these blocks to facilitate communication with the machine and input/output:
+
+Package: `build_root`, `build_path`, `local_package`
+Communication: `execute`, `sudo`, `test`
+IO: `ask`, `detail`, `error`, `info`, `output`, `warn`
 
 #### Projects
 
-To automatically check out and prepare (i.e. run bundler for ruby projects) a project you can add a `Vagabund::Settler::Project` object to your provisioner config:
+To automatically check out and prepare (i.e. run bundler for ruby projects) a project you can add a it to your provisioner config:
 
 ```ruby
-  config.vm.provision :settle do |settler|
-    settler.project = Vagabund::Settler::Projects::Base.new("/var/www/example", {git: 'git@github.com:someone/example.git'})
-    settler.project = Vagabund::Settler::Projects::Ruby.new("/var/www/mygem", {git: 'git@github.com:someone/mygem.git'})
-    settler.project = Vagabund::Settler::Projects::Rails.new("/var/www/myapp", {git: 'git@github.com:someone/myapp.git'})
+config.vm.provision :settle do |settler|
+  settler.projects do |projects|
+    # A simple project, it will only be cloned into a local path
+    project 'my_project', git: 'git@github.com:example/example.git'
+
+    # A ruby or rails project will be bundled after it is cloned
+    project :ruby, 'ruby_project', git: 'git@github.com:example/example.git'
+    project :rails, 'my_app', git: 'git@github.com:example/example.git'
   end
+  
+  # You can also add a project outside a projects config block
+  settler.project 'my_project', git: 'git@github.com:example/example.git'
+end
 ```
 
 For ruby/rails projects your gem dependencies will be automatically installed for you with `bundle install`.
+
+You can configure project paths for all or individual projects.
+
+```ruby
+config.vm.provision :settle do |settler|
+  settler.projects do |projects|
+    # All projects that do not override the path will be cloned into /some/local/path/PROJECT_NAME
+    projects.path = '/some/local/path'
+
+    # Project ends up in /some/local/path/my_project
+    project 'my_project', git: 'git@github.com:example/example.git'
+
+    # Project ends up in /another/path/other_project
+    project 'other_project', git: 'git@github.com:example/example.git', path: '/another/path/other_project'
+
+    # Project ends up in /another/path/third_project
+    project 'third_project', git: 'git@github.com:example/example.git', projects_path: '/another/path'
+  end
+end
+```
+
+All config options (and some additional features) can also be called through the config DSL when passing a block.
+
+```ruby
+config.vm.provision :settle do |settler|
+  settler.projects do |projects|
+    
+    project :ruby, 'my_project', git: 'git@github.com:example/example.git' do |project_config|
+      # Project configuration DSL is available within an optional block
+
+      project_config.path = '/path/to/my_project'
+      
+      # Do something before provisioning the project
+      before do |project, machine, channel|
+        info "Executing some command on the server..."
+        execute "cd #{path}; execute some command on the server"
+      end
+
+      # Do something before pulling the project
+      before_pull(Proc.new { sudo "execute something as root" })
+
+      # Do something after bundling the project
+      after_bundle "execute inline server command"
+    end
+  
+  end
+end
+```
+
+There are a number of DSL methods that allow you to pass additional blocks/procs as before and after hooks, which will be executed within the context of the project instance:
+
+* `before` - Executed before provisioning the project. Also aliased to `before_project`.
+* `before_pull` - Executed before pulling the project from it's source.
+* `after_pull` - Executed after pulling the project.
+* `before_bundle` - Executed before running bundler (ruby/rails projects only).
+* `after_bundle` - Executed after running bundler (ruby/rails projects only).
+* `after` - Executed after provisioning the project. Also aliased to `after_project`.
+
+*Unlike packages, projects do not allow you to provide custom blocks/procs for the actual actions, only the before/after hooks.*
+
+These each provide three arguments to the block, which are the project itself, the machine, and the channel (which is a shortcut for `machine.communicate`). However there are additionally a few helper methods available within these blocks to facilitate communication with the machine and input/output:
+
+Project: `path`
+Communication: `execute`, `sudo`, `test`
+IO: `ask`, `detail`, `error`, `info`, `output`, `warn`
 
 ## Development
 
