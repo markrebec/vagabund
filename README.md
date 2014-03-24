@@ -13,9 +13,20 @@ You can configure the host and guest home directories and override or add to the
 
 Really, this can be used to copy any files/directories from the host to the guest, not just "config files". Wildcard operators are not currently supported, but directories will be copied recursively.
 
-The default list of config files includes `~/.vimrc`, `~/.viminfo`, `~/.gitconfig` and `~/.ssh/known_hosts`
+The default list of config files includes `~/.vimrc`, `~/.viminfo`, `~/.gitconfig` and `~/.ssh/known_hosts`.
 
-See the example block passed to `config.vm.provision :squat` in this project's `Vagrantfile` for usage and configuration options.
+```ruby
+config.vm.provision :squat do |squatter|
+  squatter.host_home = '/Users/markrebec' # the host directory used for relative file paths
+  squatter.guest_home = '/home/vagrant'   # the guest directory used for relatvie file paths
+  
+  squatter.files = ['.vimrc', '.gitconfig', ['file.env', '.env']] # override the default list of files
+  squatter.file = '.filename'                                     # home-relative path
+  squatter.file = '/path/to/.testfile'                            # absolute path
+  squatter.file = ['/host/path/.somefile', '.somefile']           # absolute host path, home-relative guest path
+  squatter.file = ['.somefile', '/guest/path/.somefile']          # home-relative host path, absolute guest path
+end
+```
 
 ### Settler
 
@@ -24,9 +35,9 @@ Settler is a provisioner that allows you to easily install software packages and
 You can invoke the provisioner with the following in your `Vagrantfile`:
 
 ```ruby
-  config.vm.provision :settle do |settler|
-    # add software packages with settler.package and projects with settler.project
-  end
+config.vm.provision :settle do |settler|
+  # add software packages with settler.package and projects with settler.project
+end
 ```
 
 #### Packages
