@@ -2,7 +2,74 @@ module Vagabund
   module Squatter
     class Provisioner < Vagrant.plugin(2, :provisioner)
 
+      def configure(root_config)
+        @root_config = root_config
+      end
+
       def provision
+        create_user
+        upload_files
+      end
+
+      def cleanup
+        # remove the user?
+        super
+      end
+
+      def create_user
+        if config.user.create?
+          if @machine.communicate.test "[ `getent passwd | grep -c '^#{config.user.username}:'` == 0 ]"
+            @machine.ui.info "Creating user #{config.user.username}..."
+            @machine.communicate.sudo config.user.to_s
+
+            # Copy over the authorized_keys and known_hosts files being used currently for compatibility
+            if !@machine.communicate.test "[ -d #{config.user.home}/.ssh ]"
+              ssh_user_home = ''
+              @machine.communicate.execute "echo $HOME" do |type,data|
+                ssh_user_home = data.chomp if type == :stdout
+              end
+              
+              @machine.communicate.sudo "mkdir -p #{config.user.home}/.ssh"
+              
+              # Copy the authorized_keys file if it doesn't exist or touch it if the current user doesn't have one to copy
+              unless @machine.communicate.test("[ -f #{config.user.home}/.ssh/authorized_keys ]")
+                if @machine.communicate.test("[ -f #{ssh_user_home}/.ssh/authorized_keys ]")
+                  @machine.communicate.sudo "cp #{ssh_user_home}/.ssh/authorized_keys #{config.user.home}/.ssh/authorized_keys"
+                else
+                  @machine.communicate.sudo "touch #{config.user.home}/.ssh/authorized_keys"
+                end
+              end
+
+              # Add any public keys provided
+              unless config.user.pubkeys.nil?
+                @machine.communicate.sudo "echo \"#{config.user.pubkeys}\" >> #{config.user.home}/.ssh/authorized_keys"
+              end
+              
+              if !@machine.communicate.test("[ -f #{config.user.home}/.ssh/known_hosts ]") && @machine.communicate.test("[ -f #{ssh_user_home}/.ssh/known_hosts ]")
+                @machine.communicate.sudo "cp #{ssh_user_home}/.ssh/known_hosts #{config.user.home}/.ssh/known_hosts"
+              end
+              
+              @machine.communicate.sudo "chown -R #{config.user.username} #{config.user.home}/.ssh"
+              @machine.communicate.sudo "chgrp -R #{config.user.username} #{config.user.home}/.ssh"
+            end
+
+            # Add to sudoers
+            if config.user.sudo
+              @machine.communicate.sudo "echo \"#{config.user.username} ALL=(ALL) NOPASSWD:ALL\" > /etc/sudoers.d/#{config.user.username}"
+              @machine.communicate.sudo "chmod 0440 /etc/sudoers.d/#{config.user.username}"
+            end
+          else
+            @machine.ui.warn "User #{config.user.username} already exists"
+          end
+            
+        end
+      rescue
+        @machine.ui.error "Failed to create user #{config.user.username}"
+        @machine.communicate.sudo "userdel -r forthrail" rescue nil
+        @machine.communicate.sudo "rm -rf /etc/sudoers.d/#{config.user.username}"
+      end
+
+      def upload_files
         config.files.each do |file|
           from, to = expanded_paths(file)
 

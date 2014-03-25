@@ -1,3 +1,5 @@
+require_relative 'user'
+
 module Vagabund
   module Squatter
     class Config < Vagrant.plugin(2, :config)
@@ -17,13 +19,16 @@ module Vagabund
         files << filename
       end
 
-      # TODO these should be guest/host OS agnostic
       def host_home
         @host_home ||= File.expand_path('~')
       end 
 
       def guest_home
         @guest_home ||= '~'
+      end
+
+      def user
+        @user ||= User.new
       end
 
     end
