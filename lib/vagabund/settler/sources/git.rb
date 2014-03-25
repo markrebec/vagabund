@@ -8,16 +8,14 @@ module Vagabund
           machine.ui.detail "Cloning #{origin} into #{target_path}..."
           machine.communicate.execute "mkdir -p #{File.dirname(target_path)}"
           machine.communicate.execute "git clone #{origin} #{target_path}" do |type,data|
-            if [:stderr, :stdout].include?(type)
-              color = type == :stdout ? :green : :red
-              options = {
-                color: color,
-                new_line: false,
-                prefix: false
-              }
+            color = type == :stderr ? :red : :green
+            options = {
+              color: color,
+              new_line: false,
+              prefix: false
+            }
 
-              machine.ui.detail(data, options)
-            end
+            machine.ui.detail(data, options)
           end
           target_path
         end
@@ -25,16 +23,14 @@ module Vagabund
         def update(machine, target_path)
           machine.ui.detail "Updating #{target_path} from #{origin}..."
           machine.communicate.execute "cd #{target_path}; git pull" do |type,data|
-            if [:stderr, :stdout].include?(type)
-              color = type == :stdout ? :green : :red
-              options = {
-                color: color,
-                new_line: false,
-                prefix: false
-              }
+            color = type == :stderr ? :red : :green
+            options = {
+              color: color,
+              new_line: false,
+              prefix: false
+            }
 
-              machine.ui.detail(data, options)
-            end
+            machine.ui.detail(data, options)
           end
           target_path
         end

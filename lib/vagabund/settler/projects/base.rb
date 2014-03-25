@@ -50,16 +50,15 @@ module Vagabund
                 opts = {verbose: false}.merge(args.extract_options!)
                 if opts[:verbose] == true
                   machine.communicate.send cmd, *args, opts do |type,data|
-                    if [:stderr, :stdout].include?(type)
-                      color = type == :stdout ? :green : :red
-                      options = {
-                        color: color,
-                        new_line: false,
-                        prefix: false
-                      }
+                    color = type == :stderr ? :red : :green
+                    options = {
+                      color: color,
+                      new_line: false,
+                      prefix: false
+                    }
 
-                      detail(data, options)
-                    end
+                    detail(data, options)
+                    block.call(type, data) unless block.nil?
                   end
                 else
                   machine.communicate.send cmd, *args, opts, &block
