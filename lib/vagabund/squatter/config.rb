@@ -23,7 +23,7 @@ module Vagabund
       end 
 
       def guest_home
-        @guest_home ||= '/home/vagrant'
+        @guest_home ||= '~'
       end
 
     end

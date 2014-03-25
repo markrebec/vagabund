@@ -17,6 +17,14 @@ module Vagabund
 
       protected
 
+      def guest_home
+        gh_path = config.guest_home
+        @machine.communicate.execute "cd #{gh_path}; pwd" do |type, data|
+          gh_path = data.chomp if type == :stdout
+        end
+        gh_path
+      end
+
       def expanded_paths(file)
         if file.is_a?(Array) # separate source and destination, both expanded relative to home if not absolute
           from = Pathname.new(file[0]).absolute? ? file[0] : File.expand_path(File.join(config.host_home, file[0]))
@@ -25,7 +33,7 @@ module Vagabund
           from = to = file
         else # expand path relative to home
           from = File.expand_path(File.join(config.host_home, file))
-          to = File.expand_path(File.join(config.guest_home, file))
+          to = File.expand_path(File.join(guest_home, file))
         end
 
         [from, to]
