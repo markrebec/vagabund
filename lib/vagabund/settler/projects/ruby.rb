@@ -12,7 +12,7 @@ module Vagabund
         
         def bundle(machine)
           exec_before :bundle, machine
-          machine.ui.detail "Bundling ruby project #{name}..."
+          machine.ui.detail "Bundling #{self.class.name.split('::').last.downcase} project #{name}..."
           machine.communicate.execute "cd #{config.project_path}; bundle install" do |type,data|
             color = type == :stderr ? :red : :green
             options = {
