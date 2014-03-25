@@ -31,18 +31,14 @@ module Vagabund
               
               @machine.communicate.sudo "mkdir -p #{config.user.home}/.ssh"
               
-              # Copy the authorized_keys file if it doesn't exist or touch it if the current user doesn't have one to copy
-              unless @machine.communicate.test("[ -f #{config.user.home}/.ssh/authorized_keys ]")
-                if @machine.communicate.test("[ -f #{ssh_user_home}/.ssh/authorized_keys ]")
+              if config.user.pubkeys.nil?
+                # Copy the authorized_keys file if it doesn't exist and no public keys were provided
+                if !@machine.communicate.test("[ -f #{config.user.home}/.ssh/authorized_keys ]") && @machine.communicate.test("[ -f #{ssh_user_home}/.ssh/authorized_keys ]")
                   @machine.communicate.sudo "cp #{ssh_user_home}/.ssh/authorized_keys #{config.user.home}/.ssh/authorized_keys"
-                else
-                  @machine.communicate.sudo "touch #{config.user.home}/.ssh/authorized_keys"
                 end
-              end
-
-              # Add any public keys provided
-              unless config.user.pubkeys.nil?
-                @machine.communicate.sudo "echo \"#{config.user.pubkeys}\" >> #{config.user.home}/.ssh/authorized_keys"
+              else
+                # Add the public key(s) provided
+                @machine.communicate.sudo "echo \"#{config.user.pubkeys}\" > #{config.user.home}/.ssh/authorized_keys"
               end
               
               if !@machine.communicate.test("[ -f #{config.user.home}/.ssh/known_hosts ]") && @machine.communicate.test("[ -f #{ssh_user_home}/.ssh/known_hosts ]")
