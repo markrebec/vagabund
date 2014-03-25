@@ -24,7 +24,6 @@ module Vagabund
             project.provision @machine
           rescue Vagrant::Errors::VagrantError => e
             machine.ui.error "Failed to provision project #{project.name}!"
-            machine.ui.error e.message(false), prefix: false
             machine.ui.detail "#{e.message} in #{[e.backtrace[0..5], '...'].join($/)}", prefix: false
           end
         end
