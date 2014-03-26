@@ -14,8 +14,14 @@ module Vagabund
 
         def pull(machine)
           exec_before :pull, machine
-          config.source.pull machine, project_path
+          if config.puller.nil?
+            config.source.pull machine, project_path
+          else
+            action_exec config.puller, machine
+          end
           exec_after :pull, machine
+        rescue StandardError => e
+          raise Settler::Errors::ProjectError, e
         end
         
         def exec_before(action, machine)
