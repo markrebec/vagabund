@@ -18,8 +18,8 @@ module Vagabund
                 opts = args.extract_options!
 
                 cmd_proc = Proc.new do |project, machine, channel|
-                  cmd = "cd #{project.build_path}; #{command}"
-                  opts[:sudo] ? channel.sudo(cmd) : channel.execute(cmd)
+                  cmd = "cd #{project.project_path}; #{command}"
+                  execute cmd, {verbose: true}.merge(opts)
                 end
 
                 config.send "#{hook_action}=".to_sym, [] if config.send(hook_action.to_sym).nil?
@@ -54,8 +54,8 @@ module Vagabund
               opts = args.extract_options!
 
               cmd_proc = Proc.new do |project, machine, channel|
-                cmd = "cd #{project.build_path}; #{command}"
-                opts[:sudo] ? channel.sudo(cmd) : channel.execute(cmd)
+                cmd = "cd #{project.project_path}; #{command}"
+                execute cmd, {verbose: true}.merge(opts)
               end
 
               config.send "#{action}=".to_sym, cmd_proc
