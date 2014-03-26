@@ -43,7 +43,7 @@ module Vagabund
 
         def extract(machine)
           exec_before :extract, machine
-          machine.ui.detail "Unpacking #{local_file}..."
+          machine.ui.detail "Unpacking #{name}-#{version}..."
           action_exec config.extractor, machine
           exec_after :extract, machine
         rescue StandardError => e

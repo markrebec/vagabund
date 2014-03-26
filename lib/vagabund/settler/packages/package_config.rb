@@ -79,7 +79,7 @@ module Vagabund
         end
 
         def local_package
-          config.local_package ||= File.join(build_root, File.basename(source.origin))
+          config.local_package ||= File.join(build_root, (File.basename(source.origin) rescue "#{name}-#{version}"))
         end
         alias_method :local_file, :local_package
 
