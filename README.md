@@ -211,12 +211,12 @@ There are a number of DSL methods that allow you to pass additional blocks/procs
 
 * `before` - Executed before provisioning the project. Also aliased to `before_project`.
 * `before_pull` - Executed before pulling the project from it's source.
+* `puller` - Override the default puller with your own.
 * `after_pull` - Executed after pulling the project.
 * `before_bundle` - Executed before running bundler (ruby/rails projects only).
+* `bundler` - Override the default bundler with your own (ruby/rails projects only).
 * `after_bundle` - Executed after running bundler (ruby/rails projects only).
 * `after` - Executed after provisioning the project. Also aliased to `after_project`.
-
-*Unlike packages, projects do not allow you to provide custom blocks/procs for the actual actions, only the before/after hooks.*
 
 These each provide three arguments to the block, which are the project itself, the machine, and the channel (which is a shortcut for `machine.communicate`). However there are additionally a few helper methods available within these blocks to facilitate communication with the machine and input/output:
 
