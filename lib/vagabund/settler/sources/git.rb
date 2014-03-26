@@ -6,7 +6,11 @@ module Vagabund
         
         def clone(machine, target_path)
           machine.ui.detail "Cloning #{origin} into #{target_path}..."
-          machine.communicate.execute "mkdir -p #{File.dirname(target_path)}"
+          unless machine.communicate.test "[ -d #{File.dirname(target_path)} ]"
+            machine.communicate.sudo "mkdir -p #{File.dirname(target_path)}"
+            machine.communicate.sudo "chown -R #{machine.ssh_info[:username]} #{File.dirname(target_path)}"
+            machine.communicate.sudo "chgrp -R #{machine.ssh_info[:username]} #{File.dirname(target_path)}"
+          end
           machine.communicate.execute "git clone #{origin} #{target_path}" do |type,data|
             color = type == :stderr ? :red : :green
             options = {

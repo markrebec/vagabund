@@ -6,7 +6,11 @@ module Vagabund
         
         def upload(machine, target_path)
           machine.ui.detail "Uploading #{origin} to #{target_path}..."
-          machine.communicate.execute "mkdir -p #{File.dirname(target_path)}"
+          unless machine.communicate.test "[ -d #{File.dirname(target_path)} ]"
+            machine.communicate.sudo "mkdir -p #{File.dirname(target_path)}"
+            machine.communicate.sudo "chown -R #{machine.ssh_info[:username]} #{File.dirname(target_path)}"
+            machine.communicate.sudo "chgrp -R #{machine.ssh_info[:username]} #{File.dirname(target_path)}"
+          end
           machine.communicate.upload origin, target_path
           target_path
         end
