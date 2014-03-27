@@ -8,4 +8,6 @@ end
 
 group :plugins do
   gem "vagabund", path: "."
+  gem "vagrant-aws"
+  gem "vagrant-awsinfo"
 end

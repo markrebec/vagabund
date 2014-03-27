@@ -32,6 +32,13 @@ module Vagabund
       require File.expand_path('../vagabund/settler/provisioner', __FILE__)
       Settler::Provisioner
     end
+
+    # Boxer
+
+    command :boxer do
+      require File.expand_path('../vagabund/boxer/command', __FILE__)
+      Boxer::Command
+    end
   end
 end
 
