@@ -28,6 +28,34 @@ config.vm.provision :squat do |squatter|
 end
 ```
 
+You can also use squatter to provision a new user account on the guest OS. This is particularly useful if you're creating a custom base box and want a user account other than the default `vagrant` user.
+
+It's important to note that the user is created before files are copied, but if you want the files copied by squatter to be copied into your new user's home directory, you'll need to specify the guest home path to match your user.
+
+```ruby
+config.vm.provision :squat do |squatter|
+  # Create a user with the given username
+  squatter.user.username = 'example'                # required
+
+  # Set the home directory for the user
+  squatter.user.home = '/home/example'              # optional
+  
+  # Set the primary group
+  squatter.user.group = 'example'                   # optional
+
+  # Set additional groups
+  squatter.user.groups = ['rvm', 'admins']          # optional
+
+  # Set the public key that should be added to .ssh/authorized_keys
+  # If not specified, the CURRENT user's authorized_keys file is copied over to the new user
+  # Add multiple keys by using an array
+  squatter.user.public_key = '/path/to/key.pub'     # optional. a filepath, string or array of filepaths/strings
+
+  # Add an ssh config file for the user
+  squatter.user.ssh_config = '/path/to/.ssh/config' # optional. a filepath or string
+end
+```
+
 ### Settler
 
 Settler is a provisioner that allows you to easily install software packages and checkout projects you'll be working on.
