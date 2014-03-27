@@ -30,7 +30,7 @@ end
 
 You can also use squatter to provision a new user account on the guest OS. This is particularly useful if you're creating a custom base box and want a user account other than the default `vagrant` user.
 
-It's important to note that the user is created before files are copied, but if you want the files copied by squatter to be copied into your new user's home directory, you'll need to specify the guest home path to match your user.
+It's important to note that the files copied over by squatter are copied by the **current** user, not the user being created here. You can specify the guest home path to match your new user's home directory, but any files copied will be owned by the **current** ssh user.
 
 ```ruby
 config.vm.provision :squat do |squatter|
