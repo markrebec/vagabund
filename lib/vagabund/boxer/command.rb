@@ -13,7 +13,7 @@ module Vagabund
       end
 
       def execute
-        options = Struct.new(:provider, :name).new(provider: 'virtualbox')
+        options = Struct.new(:name)
         
         opts = OptionParser.new do |o|
           o.banner = "Usage: vagrant boxer [<virtual_machines> [options]]"
@@ -21,10 +21,6 @@ module Vagabund
           o.separator "Options:"
           o.separator ""
 
-          o.on("--provider PROVIDER", "Back the box with a specific provider") do |value|
-            options.provider = value
-          end
-          
           o.on("--name NAME", "Name the box (and associated AMI for the aws provider)") do |value|
             options.name = value
           end
