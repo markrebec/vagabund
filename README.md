@@ -252,6 +252,30 @@ These each provide three arguments to the block, which are the project itself, t
 * Communication: `execute`, `sudo`, `test`
 * I/O: `ask`, `detail`, `error`, `info`, `output`, `warn`
 
+### Boxer
+
+Boxer is a new command for vagrant that wraps up the creation of boxes for VirtualBox and AWS. It uses the built in `vagrant package` to package VirtualBox VMs, and packages AWS instances by creating an AMI and a box that points to that AMI.
+
+You can run boxer on a stopped VM with `vagrant boxer machine --name some-box-name`. Passing in a `machine` is optional, and without one all loaded machines will be boxed. The `--name` flag is also optional, and if not passed the name of the current machine (`default` by default) will be used.
+
+**VirtualBox**
+
+    $ vagrant up --provider virtualbox
+    $ vagrant halt
+    $ vagrant boxer --name mybox-precise64-0.1.0
+    $ vagrant destroy -f
+
+This will leave you with a vagrant box file backed by VirtualBox called `mybox-precise64-0.1.0-virtualbox.box` in the current directory.
+
+**AWS**
+
+    $ vagrant up --provider aws
+    $ vagrant halt
+    $ vagrant boxer --name mybox-precise64-0.1.0
+    $ vagrant destroy -f
+
+This will create an EC2 AMI named `mybox-precise64-0.1.0-aws` and leave you with a vagrant box file backed by AWS and pointing to the new AMI called `mybox-precise64-0.1.0-aws.box` in the current directory.
+
 ## Development
 
 Make sure you read the documentation at [http://docs.vagrantup.com/v2/plugins/index.html](http://docs.vagrantup.com/v2/plugins/index.html) to familiarize yourself with basic usage and development practices for vagrant plugins.
