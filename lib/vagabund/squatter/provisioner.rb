@@ -40,6 +40,10 @@ module Vagabund
                 # Add the public key(s) provided
                 @machine.communicate.sudo "echo \"#{config.user.pubkeys}\" > #{config.user.home}/.ssh/authorized_keys"
               end
+
+              unless config.user.ssh_conf_str.nil?
+                @machine.communicate.sudo "echo \"#{config.user.ssh_conf_str}\" > #{config.user.home}/.ssh/config", verbose: true
+              end
               
               if !@machine.communicate.test("[ -f #{config.user.home}/.ssh/known_hosts ]") && @machine.communicate.test("[ -f #{ssh_user_home}/.ssh/known_hosts ]")
                 @machine.communicate.sudo "cp #{ssh_user_home}/.ssh/known_hosts #{config.user.home}/.ssh/known_hosts"

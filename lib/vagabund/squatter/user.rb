@@ -1,7 +1,7 @@
 module Vagabund
   module Squatter
     class User
-      attr_accessor :username, :password, :home, :shell, :group, :groups, :sudo, :public_key
+      attr_accessor :username, :password, :home, :shell, :group, :groups, :sudo, :public_key, :ssh_config
 
       def home
         @home || "/home/#{username}"
@@ -20,6 +20,16 @@ module Vagabund
               pubkey
             end
           end.join($/)
+        end
+      end
+
+      def ssh_conf_str
+        unless @ssh_config.nil?
+          begin
+            File.read(File.expand_path(@ssh_config)).chomp
+          rescue Exception => e
+            @ssh_config
+          end
         end
       end
 
