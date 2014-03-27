@@ -254,6 +254,15 @@ These each provide three arguments to the block, which are the project itself, t
 
 ### Boxer
 
+#### Requirements
+
+If you plan on using boxer with aws, you'll need the [AWS Command Line Interface](http://aws.amazon.com/cli/) as well as the [vagrant-aws](https://github.com/mitchellh/vagrant-aws) and [vagrant-awsinfo](https://github.com/johntdyer/vagrant-awsinfo) vagrant plugins, which you can install with:
+
+    $ vagrant plugin install vagrant-aws
+    $ vagrant plugin install vagrant-awsinfo
+
+#### Usage
+
 Boxer is a new command for vagrant that wraps up the creation of boxes for VirtualBox and AWS. It uses the built in `vagrant package` to package VirtualBox VMs, and packages AWS instances by creating an AMI and a box that points to that AMI.
 
 You can run boxer on a stopped VM with `vagrant boxer machine --name some-box-name`. Passing in a `machine` is optional, and without one all loaded machines will be boxed. The `--name` flag is also optional, and if not passed the name of the current machine (`default` by default) will be used.
