@@ -34,6 +34,8 @@ module Vagabund
           box_name = "#{options.name || machine.name}-#{machine.provider_name}"
           box_file = File.expand_path("./#{box_name}.box")
           
+          @env.ui.info "==> #{machine.name}: Packaging box for provider #{machine.provider_name}", bold: true
+
           if box_exists?(box_file)
             @env.ui.error "The file #{box_file} already exists. Please remove this file or specify a different box name."
             next
@@ -102,7 +104,7 @@ module Vagabund
           @env.ui.warn "==> #{image_id}: An AMI with the name #{box_name} already exists", bold: true
           @env.ui.warn "    #{image_id}: Using existing AMI to package the box"
         else
-          instance_id = `vagrant awsinfo -k instance_id`.chomp.split($/).last
+          instance_id = `vagrant awsinfo -m #{machine.name} -k instance_id`.chomp.split($/).last
           @env.ui.info "==> #{instance_id}: Packaging AWS instance into AMI #{box_name}...", bold: true
           
           wait_for_instance_state instance_id, 'stopped'
