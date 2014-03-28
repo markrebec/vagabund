@@ -22,7 +22,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.ssh.forward_agent = true
 
   config.vm.define "vagabund-testing", primary: true do |machine|
-    machine.vm.provider "virtualbox" do |vb|
+    machine.vm.provider "virtualbox" do |vb, override|
       override.vm.box = "hashicorp/precise64"#"vagabund-test-box"
 
       vb.name = "vagabund-testing"
