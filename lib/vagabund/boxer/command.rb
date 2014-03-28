@@ -16,7 +16,7 @@ module Vagabund
         options = Struct.new(:name)
         
         opts = OptionParser.new do |o|
-          o.banner = "Usage: vagrant boxer [<virtual_machines> [options]]"
+          o.banner = "Usage: vagrant boxer [options] [name]"
           o.separator ""
           o.separator "Options:"
           o.separator ""
