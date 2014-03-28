@@ -95,7 +95,7 @@ module Vagabund
       def expanded_paths(file)
         if file.is_a?(Array) # separate source and destination, both expanded relative to home if not absolute
           from = Pathname.new(file[0]).absolute? ? file[0] : File.expand_path(File.join(config.host_home, file[0]))
-          to = Pathname.new(file[1]).absolute? ? file[1] : File.expand_path(File.join(config.host_home, file[1]))
+          to = Pathname.new(file[1]).absolute? ? file[1] : File.expand_path(File.join(config.guest_home, file[1]))
         elsif Pathname.new(file).absolute? # already absolute
           from = to = file
         else # expand path relative to home
