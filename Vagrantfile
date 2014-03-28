@@ -8,6 +8,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   
   # Example config for Squatter provisioner
   config.vm.provision :squat do |squatter|
+    squatter.files = []
   end
 
   # Example config for Settler provisioner
@@ -18,13 +19,29 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
 
-  # Defaults for test box
-  config.vm.box = "vagabund-test-box"
   config.ssh.forward_agent = true
 
-  config.vm.provider "virtualbox" do |vb|
-    vb.name = "vagabund"
-    vb.memory = 2048
-    vb.cpus = 2 
-  end 
+  config.vm.define "vagabund-testing", primary: true do |machine|
+    machine.vm.provider "virtualbox" do |vb|
+      override.vm.box = "hashicorp/precise64"#"vagabund-test-box"
+
+      vb.name = "vagabund-testing"
+      vb.memory = 2048
+      vb.cpus = 2
+    end
+
+    machine.vm.provider :aws do |aws, override|
+      override.vm.box = "aws/precise64"
+      override.ssh.username = "ubuntu"
+      override.ssh.private_key_path = "~/.ssh/id_rsa"
+      override.vm.synced_folder "./", "/vagrant", disabled: true
+
+      aws.access_key_id = "AKIAIPYLMIHA5PVA4GPA"
+      aws.secret_access_key = "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"
+      aws.keypair_name = "MarkRebecMacbookAir"
+
+      aws.instance_type = "m1.large" # use a large for buiding stuff faster
+      aws.tags = {'Name' => 'vagabund-testing'}
+    end
+  end
 end
