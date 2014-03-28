@@ -21,7 +21,7 @@ module Vagabund
           o.separator "Options:"
           o.separator ""
 
-          o.on("--name NAME", "Name the box (and associated AMI for the aws provider)") do |value|
+          o.on("--box-name NAME", "Name the box (and associated AMI for the aws provider)") do |value|
             options.name = value
           end
         end
