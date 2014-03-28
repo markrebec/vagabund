@@ -89,7 +89,7 @@ module Vagabund
         if !stopped?(machine)
           if stopping?(machine)
             @env.ui.info "==> #{machine.name}: Waiting for VM to halt...", bold: true
-            instance_id = `vagrant awsinfo -k instance_id`.chomp.split($/).last
+            instance_id = `vagrant awsinfo -m #{machine.name} -k instance_id`.chomp.split($/).last
             wait_for_instance_state(instance_id)
           else
             @env.ui.warn "==> #{machine.name}: Can't package running VM. Please stop it with `vagrant halt` and try again.", bold: true
