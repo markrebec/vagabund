@@ -11,7 +11,7 @@ Squatter is a provisioner that copies all your personal config files over to the
 
 You can configure the host and guest home directories and override or add to the list of config files to be copied. Any relative paths provided will be relative to the home directories, while absolute paths will be preserved.
 
-Really, this can be used to copy any files/directories from the host to the guest, not just "config files". Wildcard operators are not currently supported, but directories will be copied recursively.
+Really, this can be used to copy any files/directories from the host to the guest, not just "config files". Wildcard operators are not currently supported, but directories will be copied recursively. You can also provide a remote source in the form of a URL or S3 resource (the AWS CLI will be used to copy the file when using S3), or a `proc`.
 
 The default list of config files includes `~/.vimrc`, `~/.viminfo`, `~/.gitconfig` and `~/.ssh/known_hosts`.
 
@@ -25,6 +25,11 @@ config.vm.provision :squat do |squatter|
   squatter.file = '/path/to/.testfile'                            # absolute path
   squatter.file = ['/host/path/.somefile', '.somefile']           # absolute host path, home-relative guest path
   squatter.file = ['.somefile', '/guest/path/.somefile']          # home-relative host path, absolute guest path
+  squatter.file = 'http://example.com/source/file'                # remote source file, home-relative guest path based of remote file basename
+  squatter.file = 's3://example-bucket/source/file'               # remote source file, home-relative guest path based of remote file basename
+  squatter.file = ['http://example.com/source/file', '.other']    # remote source file, home-relative guest path
+  squatter.file = proc { ['.source_file', '.target_file'] }       # must return a string or array, result will be interpreted like the above examples
+  squatter.file = [proc { '.source' }, proc { '.target' }]        # must each return a string, results will be interpreted like the above examples
 end
 ```
 
