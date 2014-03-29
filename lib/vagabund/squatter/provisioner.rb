@@ -92,15 +92,24 @@ module Vagabund
         gh_path
       end
 
+      def host_home
+        File.expand_path(config.host_home)
+      end
+
       def expanded_paths(file)
-        if file.is_a?(Array) # separate source and destination, both expanded relative to home if not absolute
-          from = Pathname.new(file[0]).absolute? ? file[0] : File.expand_path(File.join(config.host_home, file[0]))
+        # separate source and destination, both expanded relative to home if not absolute
+        if file.is_a?(Array)
+          from = Pathname.new(file[0]).absolute? ? file[0] : File.join(host_home, file[0])
           to = Pathname.new(file[1]).absolute? ? file[1] : File.join(guest_home, file[1])
-        elsif Pathname.new(file).absolute? # already absolute
+
+        # already absolute
+        elsif Pathname.new(file).absolute?
           from = to = file
-        else # expand path relative to home
-          from = File.expand_path(File.join(config.host_home, file))
-          to = File.expand_path(File.join(guest_home, file))
+
+        # expand path relative to home
+        else
+          from = File.join(host_home, file)
+          to = File.join(guest_home, file)
         end
 
         [from, to]
