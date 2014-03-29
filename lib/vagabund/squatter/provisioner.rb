@@ -71,14 +71,7 @@ module Vagabund
 
       def upload_files
         config.files.each do |file|
-          from, to = expanded_paths(file)
-
-          unless File.exists?(from)
-            @machine.ui.warn "Config file #{from} does not exist. Skipping."
-            next
-          end
-
-          upload from, to
+          sync *expanded_paths(file)
         end
       end
 
@@ -99,8 +92,13 @@ module Vagabund
       def expanded_paths(file)
         # separate source and destination, both expanded relative to home if not absolute
         if file.is_a?(Array)
-          from = Pathname.new(file[0]).absolute? ? file[0] : File.join(host_home, file[0])
-          to = Pathname.new(file[1]).absolute? ? file[1] : File.join(guest_home, file[1])
+          from = expanded_paths(file[0])[0]
+          to = expanded_paths(file[1])[1]
+
+        # remote source file
+        elsif file.match(/^(http[s]?|s3):\/\//i)
+          from = file
+          to = File.join(guest_home, File.basename(file))
 
         # already absolute
         elsif Pathname.new(file).absolute?
@@ -113,6 +111,29 @@ module Vagabund
         end
 
         [from, to]
+      end
+
+      def sync(from, to)
+        if from.match(/^(http[s]?|s3):\/\//i)
+          @machine.ui.detail "Downloading #{from}..."
+          Dir.mktmpdir do |dir|
+            from_file = File.join(dir, File.basename(from))
+
+            if from.match(/^http[s]?:\/\//i)
+              `curl -L -o #{from_file} #{from} 2>&1`
+            elsif from.match(/^s3:\/\//i)
+              `aws s3 cp #{from} #{from_file}`
+            end
+
+            upload from_file, to
+          end
+        else
+          unless File.exists?(from)
+            @machine.ui.warn "Local file #{from} does not exist. Skipping."
+            return
+          end
+          upload from, to
+        end
       end
 
       def upload(from, to)
