@@ -95,6 +95,10 @@ module Vagabund
           from = expanded_paths(file[0])[0]
           to = expanded_paths(file[1])[1]
 
+        # proc should return [from, to]
+        elsif file.is_a?(Proc)
+          from, to = expanded_paths(clean_room.instance_exec(@machine, @machine.communicate, &file))
+
         # remote source file
         elsif file.match(/^(http[s]?|s3):\/\//i)
           from = file
@@ -145,6 +149,49 @@ module Vagabund
           @machine.ui.error "Failed to upload config file #{from} to #{to}"
           raise e
         end
+      end
+
+      def clean_room
+        dsl = Struct.new(:machine).new(@machine)
+        dsl.class.instance_eval do
+          [:ask, :detail, :error, :info, :output, :warn].each do |cmd|
+            define_method cmd do |*args, &block|
+              machine.ui.send cmd, *args, &block
+            end
+          end
+
+          [:execute, :sudo, :test].each do |cmd|
+            define_method cmd do |*args, &block|
+              opts = {verbose: false}.merge(args.extract_options!)
+              if opts[:verbose] == true
+                machine.communicate.send cmd, *args, opts do |type,data|
+                  color = type == :stderr ? :red : :green
+                  options = {
+                    color: color,
+                    new_line: false,
+                    prefix: false
+                  }
+
+                  detail(data, options)
+                  block.call(type, data) unless block.nil?
+                end
+              else
+                machine.communicate.send cmd, *args, opts, &block
+              end
+            end
+          end
+
+          define_method :capture do |*args, &block|
+            output = ''
+            machine.communicate.execute *args do |type,data|
+              output += data if type == :stdout
+              block.call(type, data) unless block.nil?
+            end
+            output
+          end
+        end
+
+        dsl
       end
 
     end
