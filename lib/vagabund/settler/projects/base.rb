@@ -71,12 +71,21 @@ module Vagabund
                 end
               end
             end
+
+            define_method :capture do |*args, &block|
+              output = ''
+              machine.communicate.execute *args do |type,data|
+                output += data if type == :stdout
+                block.call(type, data) unless block.nil?
+              end
+              output
+            end
           end
 
           instance_exec self, machine, machine.communicate, &command if command.is_a?(Proc)
 
           self.class.instance_eval do
-            [:ask, :detail, :error, :info, :output, :warn, :execute, :sudo, :test].each do |cmd|
+            [:ask, :detail, :error, :info, :output, :warn, :capture, :execute, :sudo, :test].each do |cmd|
               undef_method cmd
             end
           end
