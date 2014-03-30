@@ -23,7 +23,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.define "vagabund-testing", primary: true do |machine|
     machine.vm.provider "virtualbox" do |vb, override|
-      override.vm.box = "hashicorp/precise64"#"vagabund-test-box"
+      override.vm.box = "hashicorp/precise64"
 
       vb.name = "vagabund-testing"
       vb.memory = 2048
@@ -40,7 +40,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       aws.secret_access_key = "iIz0y9Du8COVu5WFkMatFc8SIWgI6IVOFydwfTBe"
       aws.keypair_name = "MarkRebecMacbookAir"
 
-      aws.instance_type = "m1.large" # use a large for buiding stuff faster
+      aws.instance_type = "m1.large"
       aws.tags = {'Name' => 'vagabund-testing'}
     end
   end
