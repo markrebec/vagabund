@@ -3,6 +3,10 @@ Vagabund
 
 Vagrant plugin for Forth Rail environments. Provides automatic config management, git operations and the ability to checkout Forth Rail projects and manage services.
 
+## NOTE
+
+This is about a year old, was extracted from a since-dead codebase, and is probably outdated. I'm working on resurrecting this and releasing it as an open source plugin. You'll probably see references to "Forth Rail" all over the place until I rewrite the documentation.
+
 ## Usage
 
 ### Squatter
