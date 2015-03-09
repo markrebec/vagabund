@@ -1,4 +1,4 @@
-require_relative 'utils'
+require_relative 'mokey_patches'
 
 module Vagabund
   def self.source_root
