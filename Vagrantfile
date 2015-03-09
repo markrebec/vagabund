@@ -30,18 +30,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vb.cpus = 2
     end
 
-    machine.vm.provider :aws do |aws, override|
-      override.vm.box = "aws/precise64"
-      override.ssh.username = "ubuntu"
-      override.ssh.private_key_path = "~/.ssh/id_rsa"
-      override.vm.synced_folder "./", "/vagrant", disabled: true
+    #machine.vm.provider :aws do |aws, override|
+    #  override.vm.box = "aws/precise64"
+    #  override.ssh.username = "ubuntu"
+    #  override.ssh.private_key_path = "~/.ssh/id_rsa"
+    #  override.vm.synced_folder "./", "/vagrant", disabled: true
 
-      aws.access_key_id = "AKIAIPYLMIHA5PVA4GPA"
-      aws.secret_access_key = "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"
-      aws.keypair_name = "MarkRebecMacbookAir"
+    #  aws.access_key_id = "AKIAIPYLMIHA5PVA4GPA"
+    #  aws.secret_access_key = "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"
+    #  aws.keypair_name = "MarkRebecMacbookAir"
 
-      aws.instance_type = "m1.large"
-      aws.tags = {'Name' => 'vagabund-testing'}
-    end
+    #  aws.instance_type = "m1.large"
+    #  aws.tags = {'Name' => 'vagabund-testing'}
+    #end
   end
 end
