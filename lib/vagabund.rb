@@ -1,4 +1,4 @@
-require_relative 'mokey_patches'
+require_relative 'monkey_patches'
 
 module Vagabund
   def self.source_root
