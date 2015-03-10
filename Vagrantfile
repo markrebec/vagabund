@@ -1,6 +1,9 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+require 'dotenv'
+Dotenv.load
+
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
@@ -36,8 +39,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     #  override.ssh.private_key_path = "~/.ssh/id_rsa"
     #  override.vm.synced_folder "./", "/vagrant", disabled: true
 
-    #  aws.access_key_id = "AKIAIPYLMIHA5PVA4GPA"
-    #  aws.secret_access_key = "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"
+    #  aws.access_key_id = ENV['AWS_ACCESS_KEY_ID']
+    #  aws.secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
     #  aws.keypair_name = "MarkRebecMacbookAir"
 
     #  aws.instance_type = "m1.large"
