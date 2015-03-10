@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Vagabund::VERSION
   spec.authors       = ["Mark Rebec"]
   spec.email         = ["mark@markrebec.com"]
-  spec.summary       = "Vagrant plugin for Forth Rail"
-  spec.description   = "Vagrant plugin for Forth Rail environments. Provides automatic config management, git operations and the ability to checkout Forth Rail projects and manage services."
+  spec.summary       = "Vagrant plugin for provisioning users, configs, packages, projects and more."
+  spec.description   = "Vagrant plugin providing automatic config management, git operations and the ability to checkout projects and manage services."
   spec.homepage      = "https://github.com/Graphicly/vagabund"
   spec.license       = "Copyright 2014 Graphicly"
 

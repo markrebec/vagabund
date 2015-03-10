@@ -1,11 +1,7 @@
 Vagabund
 ========
 
-Vagrant plugin for Forth Rail environments. Provides automatic config management, git operations and the ability to checkout Forth Rail projects and manage services.
-
-## NOTE
-
-This is about a year old, was extracted from a since-dead codebase, and is probably outdated. I'm working on resurrecting this and releasing it as an open source plugin. You'll probably see references to "Forth Rail" all over the place until I rewrite the documentation.
+Vagrant plugin providing automatic config management, git operations and the ability to checkout projects and manage services. Adds custom provisioners for "squatting" a machine by temporarily copying config files like your vim and git configs, and "settling" a machine by provisioning a user account, easily installing packages of all types and automatically checking out any projects you plan to work on. There is also the "boxer" component, which makes it easier to package and release custom boxes for different providers.
 
 ## Usage
 
@@ -302,10 +298,4 @@ Make sure you read the documentation at [http://docs.vagrantup.com/v2/plugins/in
 
 ### Test Box
 
-The default `Vagrantfile` points to a box called `vagabund-test-box` and uses the VirtualBox provider. You will need to add the box manually with `vagrant box add` or edit the `Vagrantfile` to point to an available base box (**but do not commit your changes**). You can use any base box you'd like to test, but it is recommended you use the latest `forthrail/precise64` box available.
-
-If you want to use the `forthrail/precise64` base box, normally you would login to VagrantCloud with `vagrant login`. However, `bundle exec vagrant login` is not available when working with a bundled version of vagrant, which is why we need to install the box manually. The easiest way to do this is to use the URL of the latest `.box` file on S3 directly. Example (replace the URL with the latest version of the base box):
-
-    $ bundle exec vagrant box add vagabund-test-box https://s3.amazonaws.com/forth-rail-devops/vagrant/boxes/forthrail-precise64-0.1.0-virtualbox.box
-
-From here you can use `bundle exec vagrant` as you normally would, which will use the bundled version of vagrant (instead of the system vagrant) and include this plugin automatically.
+The default `Vagrantfile` points to the default `hashicorp/precise64` box and uses the VirtualBox provider. You can use any base box you'd like for development and testing, just edit the `Vagrantfile` to point to an available base box (**but do not commit your changes**).
