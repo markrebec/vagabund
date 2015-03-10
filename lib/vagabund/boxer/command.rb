@@ -13,7 +13,7 @@ module Vagabund
       end
 
       def execute
-        options = Struct.new(:name)
+        options = Struct.new(:name).new
         
         opts = OptionParser.new do |o|
           o.banner = "Usage: vagrant boxer [options] [name]"
