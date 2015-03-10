@@ -65,7 +65,7 @@ module Vagabund
         end
       rescue
         @machine.ui.error "Failed to create user #{config.user.username}"
-        @machine.communicate.sudo "userdel -r forthrail" rescue nil
+        @machine.communicate.sudo "userdel -r #{config.user.username}" rescue nil
         @machine.communicate.sudo "rm -rf /etc/sudoers.d/#{config.user.username}"
       end
 
