@@ -10,8 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["mark@markrebec.com"]
   spec.summary       = "Vagrant plugin for provisioning users, configs, packages, projects and more."
   spec.description   = "Vagrant plugin providing automatic config management, git operations and the ability to checkout projects and manage services."
-  spec.homepage      = "https://github.com/Graphicly/vagabund"
-  spec.license       = "Copyright 2014 Graphicly"
+  spec.homepage      = "https://github.com/markrebec/vagabund"
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
