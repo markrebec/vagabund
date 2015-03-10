@@ -1,7 +1,7 @@
 Vagabund
 ========
 
-Vagrant plugin providing automatic config management, git operations and the ability to checkout projects and manage services. Adds custom provisioners for "squatting" a machine by temporarily copying config files like your vim and git configs, and "settling" a machine by provisioning a user account, easily installing packages of all types and automatically checking out any projects you plan to work on. There is also the "boxer" component, which makes it easier to package and release custom boxes for different providers.
+Vagrant plugin providing automatic config management, git operations and the ability to checkout projects and manage services. Adds custom provisioners for "squatting" a machine by temporarily copying config files like your vim and git configs and provisioning a user account, and "settling" a machine by easily installing packages of all types and automatically checking out any projects you plan to work on. There is also the "boxer" component, which makes it easier to package and release custom boxes for different providers.
 
 ## Usage
 
