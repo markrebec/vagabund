@@ -147,16 +147,21 @@ module Vagabund
           ami_json = JSON.parse(`aws ec2 describe-images --owners=self --output=json`.chomp)
           image = ami_json['Images'].select { |img| img['ImageId'] == image_id }.first
 
-          @env.ui.info "    #{image_id}: Image is in state '#{image['State']}'" if image['State'] != last_state
+          if image.nil? # sometimes AWS takes a while to even list the AMI
+            @env.ui.info "    #{image_id}: Image is in state '#{image['State']}'" if image['State'] != last_state
 
-          last_state = image['State']
-          if image['State'] == 'failed'
-            @env.ui.error "==> #{image_id}: Image Creation Failed!", bold: true
-            @env.ui.error "    #{image_id}: #{image['StateReason']['Message']}"
-            break;
-          elsif image['State'] == state
-            break;
-          end 
+            last_state = image['State']
+            if image['State'] == 'failed'
+              @env.ui.error "==> #{image_id}: Image Creation Failed!", bold: true
+              @env.ui.error "    #{image_id}: #{image['StateReason']['Message']}"
+              break;
+            elsif image['State'] == state
+              break;
+            end
+          else
+            @env.ui.info "    #{image_id}: Image is in state 'unknown'" if last_state != 'unknown'
+            last_state = 'unknown'
+          end
           
           sleep 5
         end 
