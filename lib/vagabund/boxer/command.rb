@@ -153,6 +153,9 @@ module Vagabund
           image = ami_json['Images'].select { |img| img['ImageId'] == image_id }.first
 
           if image.nil? # sometimes AWS takes a while to even list the AMI
+            @env.ui.info "    #{image_id}: Image is in state 'unknown'" if last_state != 'unknown'
+            last_state = 'unknown'
+          else
             @env.ui.info "    #{image_id}: Image is in state '#{image['State']}'" if image['State'] != last_state
 
             last_state = image['State']
@@ -163,9 +166,6 @@ module Vagabund
             elsif image['State'] == state
               break;
             end
-          else
-            @env.ui.info "    #{image_id}: Image is in state 'unknown'" if last_state != 'unknown'
-            last_state = 'unknown'
           end
           
           sleep 5
