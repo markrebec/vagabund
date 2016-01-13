@@ -81,8 +81,13 @@ module Vagabund
           exit
         end
 
-        @env.ui.info "==> #{vm_name}: Packaging VirtualBox VM '#{vm_name}' into #{File.basename(box_file)}", bold: true
-        system "vagrant package --base #{vm_name} --output #{box_file}"
+        @env.ui.info "==> #{vm_name || machine.name}: Packaging VirtualBox VM '#{vm_name || machine.name}' into #{File.basename(box_file)}", bold: true
+
+        if vm_name.nil?
+          system "vagrant package #{machine.name} --output #{box_file}"
+        else
+          system "vagrant package --base #{vm_name} --output #{box_file}"
+        end
       end
 
       def package_aws(machine, box_name, box_file=nil)
