@@ -5,6 +5,16 @@ module Vagabund
     File.expand_path('../../', __FILE__)
   end
 
+  def self.amazon_images(pattern=nil)
+    @images ||= JSON.load(`aws ec2 describe-images --owners=self --output=json`)['Images']
+    return @images if pattern.nil?
+    @images.select { |image| image['Name'].match(pattern) }
+  end
+
+  def self.most_recent_ami(pattern)
+    amazon_images(pattern).sort { |a,b| DateTime.parse(a['CreationDate']) <=> DateTime.parse(b['CreationDate']) }.last
+  end
+
   class Plugin < Vagrant.plugin(2)
     name "Vagabund"
 
